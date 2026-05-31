@@ -1,18 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
-  --muted: #a1a1aa;
-  --accent: #22d3ee;
-  --card: rgba(255, 255, 255, 0.03);
-  --border: rgba(255, 255, 255, 0.1);
+  --background: #030303;
+  --foreground: #f4f4f5;
+  --muted: #71717a;
+  --graphite: #0c0c0c;
+  --graphite-panel: #0f0f0f;
+  --graphite-elevated: #141414;
+  --accent: #22c55e;
+  --accent-dim: #166534;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-strong: rgba(255, 255, 255, 0.12);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
+  --color-graphite: var(--graphite);
   --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -26,9 +31,43 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.011em;
 }
 
 ::selection {
-  background: rgba(34, 211, 238, 0.25);
+  background: rgba(34, 197, 94, 0.18);
   color: #fff;
+}
+
+.grid-circuit {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.panel {
+  border: 1px solid var(--border);
+  background: var(--graphite-panel);
+}
+
+.panel-inset {
+  border: 1px solid var(--border);
+  background: var(--graphite);
+}
+
+.mono-label {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.flow-line {
+  background: linear-gradient(
+    to bottom,
+    rgba(34, 197, 94, 0.4),
+    rgba(255, 255, 255, 0.08)
+  );
 }

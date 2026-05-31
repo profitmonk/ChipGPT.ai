@@ -4,21 +4,22 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm text-sm font-medium tracking-wide transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-green-500/50 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-white text-zinc-950 hover:bg-zinc-200 shadow-[0_0_24px_rgba(255,255,255,0.08)]",
+          "bg-white text-zinc-950 hover:bg-zinc-100 border border-white",
         outline:
-          "border border-white/15 bg-white/5 text-white hover:bg-white/10 hover:border-white/25 backdrop-blur-sm",
-        ghost: "text-zinc-400 hover:text-white hover:bg-white/5",
-        glow: "bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/20 hover:border-cyan-400/50 shadow-[0_0_30px_rgba(34,211,238,0.15)]",
+          "border border-white/20 bg-transparent text-white hover:bg-white/[0.04] hover:border-white/30",
+        ghost: "text-zinc-400 hover:text-white hover:bg-white/[0.04]",
+        primary:
+          "bg-green-600 text-white border border-green-600 hover:bg-green-500 hover:border-green-500",
       },
       size: {
-        default: "h-11 px-6",
-        sm: "h-9 rounded-md px-4 text-xs",
-        lg: "h-12 rounded-md px-8 text-base",
+        default: "h-10 px-5",
+        sm: "h-9 px-4 text-xs",
+        lg: "h-11 px-7 text-sm",
       },
     },
     defaultVariants: {

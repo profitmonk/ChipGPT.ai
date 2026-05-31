@@ -1,6 +1,3 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type SectionHeaderProps = {
@@ -9,41 +6,37 @@ type SectionHeaderProps = {
   description?: string;
   align?: "left" | "center";
   id?: string;
+  className?: string;
 };
 
 export function SectionHeader({
   eyebrow,
   title,
   description,
-  align = "center",
+  align = "left",
   id,
+  className,
 }: SectionHeaderProps) {
   return (
-    <motion.div
+    <header
       id={id}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
-        "mb-14 max-w-3xl",
+        "mb-16 max-w-3xl",
         align === "center" && "mx-auto text-center",
-        align === "left" && "text-left"
+        className
       )}
     >
       {eyebrow && (
-        <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-cyan-400/80">
-          {eyebrow}
-        </p>
+        <p className="mono-label mb-5 text-green-600">{eyebrow}</p>
       )}
-      <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-[2.5rem] lg:leading-tight">
+      <h2 className="text-[1.75rem] font-semibold leading-[1.15] tracking-[-0.02em] text-white sm:text-[2rem] lg:text-[2.25rem]">
         {title}
       </h2>
       {description && (
-        <p className="mt-4 text-base leading-relaxed text-zinc-400 sm:text-lg">
+        <p className="mt-5 text-[15px] leading-[1.65] text-zinc-500">
           {description}
         </p>
       )}
-    </motion.div>
+    </header>
   );
 }

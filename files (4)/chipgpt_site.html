@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChipGPT — Institutional Memory for Silicon</title>
+<style>
+:root{
+  --ink:#0A0E1A; --panel:#121829; --card:#1A2236; --line:#2A3550;
+  --teal:#2DD4BF; --teald:#0F766E; --gold:#F5B841; --ice:#CBD5E1;
+  --mute:#7C8AA5; --white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink); color:var(--ice);
+  font-family:"Calibri","Segoe UI",system-ui,sans-serif;
+  line-height:1.55; overflow-x:hidden;
+}
+.serif{font-family:Georgia,"Times New Roman",serif}
+.mono{font-family:"Consolas","SF Mono",ui-monospace,monospace}
+h1,h2,h3{font-family:Georgia,serif;font-weight:700;color:var(--white);line-height:1.12}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+
+/* dot-grid motif */
+.dots{position:absolute;display:grid;gap:14px;opacity:.5;pointer-events:none}
+.dots i{width:5px;height:5px;border-radius:50%;background:var(--line);display:block}
+.dots i.on{background:var(--teal)}
+
+/* nav */
+nav{position:sticky;top:0;z-index:50;background:rgba(10,14,26,.82);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-family:Consolas,monospace;font-weight:700;letter-spacing:3px;color:var(--white);font-size:15px}
+.logo span{color:var(--teal)}
+.navlinks{display:flex;gap:30px;font-size:14px;color:var(--mute)}
+.navlinks a{transition:color .2s}
+.navlinks a:hover{color:var(--teal)}
+.btn{background:var(--teal);color:var(--ink);font-weight:700;padding:9px 20px;
+  border-radius:7px;font-size:14px;transition:transform .15s,box-shadow .15s;border:none;cursor:pointer}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(45,212,191,.28)}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ice)}
+.btn-ghost:hover{border-color:var(--teal);color:var(--teal);box-shadow:none}
+@media(max-width:760px){.navlinks{display:none}}
+
+/* hero */
+.hero{position:relative;padding:96px 0 96px;overflow:hidden}
+.hero .dots{top:60px;right:-30px}
+.hero .dots.left{top:auto;bottom:-40px;left:-40px;right:auto;opacity:.3}
+.kick{font-family:Consolas,monospace;font-size:12px;letter-spacing:4px;color:var(--teal);
+  font-weight:700;margin-bottom:22px}
+.hero h1{font-size:clamp(38px,6vw,68px);margin-bottom:18px;max-width:14ch}
+.hero h1 em{font-style:normal;color:var(--teal)}
+.hero p.sub{font-size:clamp(16px,2vw,20px);color:var(--ice);max-width:60ch;margin-bottom:34px}
+.hero .cta{display:flex;gap:14px;flex-wrap:wrap}
+.fade{opacity:0;transform:translateY(20px);animation:rise .7s forwards}
+@keyframes rise{to{opacity:1;transform:none}}
+.d1{animation-delay:.05s}.d2{animation-delay:.18s}.d3{animation-delay:.32s}.d4{animation-delay:.46s}
+
+/* dashboard mock */
+.dash{margin-top:70px;background:linear-gradient(160deg,var(--panel),var(--card));
+  border:1px solid var(--line);border-radius:16px;padding:0;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.dash-top{display:flex;align-items:center;gap:8px;padding:14px 20px;border-bottom:1px solid var(--line)}
+.dash-top .dot{width:10px;height:10px;border-radius:50%}
+.dash-title{font-family:Consolas,monospace;font-size:12px;color:var(--mute);margin-left:10px}
+.dash-live{margin-left:auto;font-family:Consolas,monospace;font-size:11px;color:var(--teal);
+  display:flex;align-items:center;gap:7px}
+.dash-live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--teal);
+  box-shadow:0 0 0 0 rgba(45,212,191,.6);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(45,212,191,.5)}70%{box-shadow:0 0 0 8px rgba(45,212,191,0)}100%{box-shadow:0 0 0 0 rgba(45,212,191,0)}}
+.dash-body{display:grid;grid-template-columns:1.1fr 1.4fr;gap:0}
+@media(max-width:760px){.dash-body{grid-template-columns:1fr}}
+.dash-metrics{padding:26px;display:grid;grid-template-columns:1fr 1fr;gap:18px;border-right:1px solid var(--line)}
+.metric .lbl{font-size:12px;color:var(--mute);margin-bottom:6px}
+.metric .val{font-family:Georgia,serif;font-size:30px;color:var(--white);font-weight:700}
+.metric .val.t{color:var(--teal)}
+.metric .val.g{color:var(--gold)}
+.stream{padding:22px 26px}
+.stream h4{font-family:Consolas,monospace;font-size:11px;letter-spacing:2px;color:var(--mute);
+  font-weight:700;margin-bottom:16px}
+.evt{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid rgba(42,53,80,.5);font-size:13.5px}
+.evt:last-child{border:none}
+.evt time{font-family:Consolas,monospace;color:var(--teal);font-size:12px;flex-shrink:0;width:42px}
+.evt span{color:var(--ice)}
+.evt b{color:var(--gold);font-weight:600}
+
+/* section scaffolding */
+section{padding:92px 0;position:relative}
+.sec-kick{font-family:Consolas,monospace;font-size:12px;letter-spacing:4px;font-weight:700;
+  color:var(--teal);margin-bottom:16px}
+.sec-h{font-size:clamp(28px,4vw,40px);margin-bottom:18px;max-width:20ch}
+.sec-lead{color:var(--mute);font-size:17px;max-width:62ch;margin-bottom:48px}
+.alt{background:var(--panel)}
+.alt .sec-kick{color:var(--gold)}
+
+/* module grid */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.mod{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:26px;
+  transition:transform .2s,border-color .2s}
+.mod:hover{transform:translateY(-4px);border-color:var(--teal)}
+.mod .tag{font-family:Consolas,monospace;font-size:10.5px;letter-spacing:1.5px;color:var(--teal);
+  font-weight:700;margin-bottom:12px;display:inline-block}
+.mod h3{font-size:18px;margin-bottom:9px;font-family:Calibri,sans-serif;color:var(--white);font-weight:700}
+.mod p{font-size:14px;color:var(--mute);line-height:1.5}
+
+/* memory feature band */
+.mem{background:linear-gradient(150deg,#0c1322,#0A0E1A);border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.mem .dots{top:40px;right:40px;opacity:.35}
+.mem-inner{display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center}
+@media(max-width:820px){.mem-inner{grid-template-columns:1fr;gap:36px}}
+.mem h2{font-size:clamp(30px,4.4vw,46px);color:var(--gold);margin-bottom:18px}
+.mem p.lead{font-size:18px;color:var(--ice);margin-bottom:26px}
+.mem ul{list-style:none;display:grid;gap:14px}
+.mem li{display:flex;gap:13px;font-size:15px;color:var(--ice)}
+.mem li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--teal);
+  margin-top:8px;flex-shrink:0;box-shadow:0 0 10px var(--teal)}
+.mem-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:30px;
+  box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.mem-card .row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;
+  border-bottom:1px solid var(--line);font-size:14px}
+.mem-card .row:last-child{border:none}
+.mem-card .row .k{color:var(--mute);font-family:Consolas,monospace;font-size:12px}
+.mem-card .row .v{color:var(--white);font-weight:600}
+.mem-card .row .v.t{color:var(--teal)}
+
+/* architecture layers */
+.layers{display:grid;gap:14px;max-width:760px;margin:0 auto}
+.layer{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);
+  border-radius:10px;padding:20px 24px}
+.layer.gold{border-left-color:var(--gold)}
+.layer.purple{border-left-color:#A78BFA;background:#1d1a30}
+.layer h3{font-size:17px;font-family:Calibri,sans-serif;font-weight:700;margin-bottom:4px}
+.layer p{font-size:13.5px;color:var(--mute)}
+.layer-arrow{text-align:center;color:var(--mute);font-size:18px;line-height:1}
+
+/* personas */
+.pers{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:900px){.pers{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.pers{grid-template-columns:1fr}}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px}
+.pcard h3{font-size:16px;font-family:Calibri,sans-serif;font-weight:700;margin-bottom:14px;color:var(--teal)}
+.pcard ul{list-style:none;display:grid;gap:10px}
+.pcard li{font-size:13.5px;color:var(--ice);padding-left:18px;position:relative}
+.pcard li::before{content:"→";position:absolute;left:0;color:var(--mute)}
+
+/* CTA */
+.cta-band{text-align:center;background:linear-gradient(150deg,var(--panel),var(--ink));
+  border:1px solid var(--line);border-radius:20px;padding:64px 40px;position:relative;overflow:hidden}
+.cta-band h2{font-size:clamp(28px,4vw,42px);margin-bottom:16px}
+.cta-band p{color:var(--ice);font-size:18px;max-width:54ch;margin:0 auto 32px}
+.cta-band .btn{font-size:16px;padding:14px 32px}
+
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-size:13px}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+footer .flinks{display:flex;gap:24px}
+footer a:hover{color:var(--teal)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">CHIP<span>GPT</span></div>
+    <div class="navlinks">
+      <a href="#what">What it does</a>
+      <a href="#memory">Memory</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#teams">Teams</a>
+    </div>
+    <button class="btn" onclick="document.getElementById('request').scrollIntoView()">Request a Briefing</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="dots" id="dotsHero"></div>
+  <div class="dots left" id="dotsHero2"></div>
+  <div class="wrap">
+    <div class="kick fade d1">AI CO-WORKERS FOR SILICON TEAMS</div>
+    <h1 class="serif fade d2">The chip-design productivity layer the largest teams built <em>for themselves.</em></h1>
+    <p class="sub fade d3">The biggest chipmakers built private AI to move faster on every node. ChipGPT brings that leverage to everyone else — co-workers that produce silicon-grade work, validated by the tools your teams already run.</p>
+    <div class="cta fade d4">
+      <button class="btn" onclick="document.getElementById('request').scrollIntoView()">Request a Briefing</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('what').scrollIntoView()">See what they do</button>
+    </div>
+
+    <!-- DASHBOARD (repointed away from yield-specifics) -->
+    <div class="dash fade d4">
+      <div class="dash-top">
+        <span class="dot" style="background:#ff5f56"></span>
+        <span class="dot" style="background:#ffbd2e"></span>
+        <span class="dot" style="background:#27c93f"></span>
+        <span class="dash-title mono">chipgpt.workspace / program-alpha</span>
+        <span class="dash-live mono">LIVE</span>
+      </div>
+      <div class="dash-body">
+        <div class="dash-metrics">
+          <div class="metric"><div class="lbl">Open derivative programs</div><div class="val t">4</div></div>
+          <div class="metric"><div class="lbl">Verification threads tracked</div><div class="val">128</div></div>
+          <div class="metric"><div class="lbl">Recurring patterns flagged</div><div class="val g">9</div></div>
+          <div class="metric"><div class="lbl">Engineer-hours returned</div><div class="val t">312</div></div>
+        </div>
+        <div class="stream">
+          <h4>CO-WORKER ACTIVITY</h4>
+          <div class="evt"><time>14:32</time><span>Pattern in PCIe block matches a <b>P1 from a prior tapeout</b> — flagged before integration</span></div>
+          <div class="evt"><time>14:18</time><span>Derivative spec delta resolved into an <b>RTL diff</b> for engineer review</span></div>
+          <div class="evt"><time>13:55</time><span>Spec, RTL, and verification plan <b>re-synced</b> after interface change</span></div>
+          <div class="evt"><time>13:41</time><span>Safety traceability matrix <b>updated</b> against latest FMEDA entries</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- WHAT IT DOES (breadth-as-fog: lifecycle kept, mechanism vague, no fake numbers) -->
+<section id="what">
+  <div class="wrap">
+    <div class="sec-kick">WHAT THEY DO</div>
+    <h2 class="sec-h">Co-workers for the work senior engineers shouldn't be doing by hand.</h2>
+    <p class="sec-lead">Deployed where your teams lose the most time — from derivative design and verification through bring-up, field, and certification. Each one delivers finished work your existing flow validates.</p>
+    <div class="grid">
+      <div class="mod"><span class="tag">DESIGN</span><h3>Derivative & Reuse</h3><p>Carry a proven design into its next variant — different memory, I/O, or node — without rebuilding it from scratch.</p></div>
+      <div class="mod"><span class="tag">VERIFICATION</span><h3>Recurring-Issue Detection</h3><p>Stop rediscovering the problems your last chip already had. Patterns surface before they reach integration.</p></div>
+      <div class="mod"><span class="tag">CONTINUITY</span><h3>Spec & Traceability</h3><p>Keep spec, RTL, verification plan, and evidence in sync as the design moves — automatically, with provenance.</p></div>
+      <div class="mod"><span class="tag">EARLY ANALYSIS</span><h3>Pre-Implementation Insight</h3><p>Understand power and risk implications of architectural choices early, while the cost of changing them is lowest.</p></div>
+      <div class="mod"><span class="tag">BRING-UP</span><h3>First-Silicon Support</h3><p>Triage lab behavior against the institutional record of what went wrong — and what fixed it — last time.</p></div>
+      <div class="mod"><span class="tag">FIELD & YIELD</span><h3>Lifecycle Continuity</h3><p>Connect what happens in the field and the fab back to the design decisions that shaped it, across the program.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- MEMORY (the one sticky-but-true punchline, kept vague on mechanism) -->
+<section id="memory" class="mem">
+  <div class="dots" id="dotsMem"></div>
+  <div class="wrap mem-inner">
+    <div>
+      <div class="sec-kick" style="color:var(--gold)">THE DIFFERENCE</div>
+      <h2 class="serif">Institutional memory for silicon.</h2>
+      <p class="lead">Most tools reset to zero on every new chip. ChipGPT doesn't. Its co-workers learn your program — so every chip starts with everything the last one knew.</p>
+      <ul>
+        <li>Agents that get smarter with your program, not just your latest prompt</li>
+        <li>Continuity across design revisions, bring-up, field, and the next derivative</li>
+        <li>The knowledge that usually leaves when an engineer does — made permanent</li>
+      </ul>
+    </div>
+    <div class="mem-card">
+      <div class="row"><span class="k">remembers across</span><span class="v">every tapeout</span></div>
+      <div class="row"><span class="k">spans</span><span class="v">your whole toolchain</span></div>
+      <div class="row"><span class="k">learns from</span><span class="v t">your own history</span></div>
+      <div class="row"><span class="k">gets stronger</span><span class="v">with every chip</span></div>
+      <div class="row"><span class="k">stays</span><span class="v">yours, and private</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE (generic-enough to reveal nothing, signals competence) -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="sec-kick">THE ARCHITECTURE</div>
+    <h2 class="sec-h" style="margin:0 auto 18px;text-align:center;max-width:24ch">Built to feed the flow you already trust.</h2>
+    <p class="sec-lead" style="margin:0 auto 48px;text-align:center">Every co-worker produces work that passes through your existing signoff before it ever reaches silicon. Nothing in your certified flow changes.</p>
+    <div class="layers">
+      <div class="layer"><h3>Co-workers + memory</h3><p>Intelligence and continuity across the program lifecycle.</p></div>
+      <div class="layer-arrow">↓</div>
+      <div class="layer"><h3>Fast iteration</h3><p>Rapid estimation and feedback, composed with the tools you already run.</p></div>
+      <div class="layer-arrow">↓</div>
+      <div class="layer gold"><h3>Human review</h3><p>Engineer sign-off before anything proceeds. The control point stays with you.</p></div>
+      <div class="layer-arrow">↓</div>
+      <div class="layer purple"><h3>Established signoff</h3><p>Your existing verification and validation flow remains the source of truth.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAMS (personas trimmed to design-side; exec/test/yield personas removed) -->
+<section id="teams" class="alt">
+  <div class="wrap">
+    <div class="sec-kick">BUILT FOR YOUR TEAM</div>
+    <h2 class="sec-h">Adapts to how each part of the team works.</h2>
+    <p class="sec-lead">Governed outputs, traceable reasoning, and a control point that always stays with your engineers.</p>
+    <div class="pers">
+      <div class="pcard"><h3>Design Leads</h3><ul><li>Carry proven IP into the next variant faster</li><li>Keep spec and RTL aligned as scope shifts</li><li>See risk before it's expensive to fix</li></ul></div>
+      <div class="pcard"><h3>Verification Leads</h3><ul><li>Surface recurring failure patterns early</li><li>Reuse what closed on the last program</li><li>Triage with the full program in context</li></ul></div>
+      <div class="pcard"><h3>Safety & Cert Leads</h3><ul><li>Keep traceability current as designs change</li><li>Assemble evidence with full provenance</li><li>Reduce the manual binder burden</li></ul></div>
+      <div class="pcard"><h3>Architecture Leads</h3><ul><li>Weigh power and structure decisions early</li><li>Ground choices in prior-program outcomes</li><li>Carry intent cleanly into the design</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA (real briefing offer, no fake waitlist) -->
+<section id="request">
+  <div class="wrap">
+    <div class="cta-band">
+      <div class="dots" id="dotsCta" style="top:24px;right:30px;opacity:.3"></div>
+      <div class="sec-kick" style="color:var(--teal)">DESIGN PARTNERS</div>
+      <h2 class="serif">The leverage the largest teams kept to themselves.</h2>
+      <p>We work alongside a small number of fabless and IDM programs each cycle. If you're carrying more silicon than headcount, let's talk.</p>
+      <button class="btn" onclick="alert('Briefing request — wire this to your form/Calendly.')">Request a Briefing</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo">CHIP<span>GPT</span></div>
+    <div class="flinks">
+      <a href="#what">What it does</a>
+      <a href="#memory">Memory</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#teams">Teams</a>
+    </div>
+    <div>© 2026 · Institutional memory for silicon</div>
+  </div>
+</footer>
+
+<script>
+// build dot-grid motifs
+function grid(el,rows,cols){
+  if(!el)return;
+  el.style.gridTemplateColumns=`repeat(${cols},5px)`;
+  for(let i=0;i<rows*cols;i++){
+    const d=document.createElement('i');
+    if(i%3===0)d.className='on';
+    el.appendChild(d);
+  }
+}
+grid(document.getElementById('dotsHero'),5,8);
+grid(document.getElementById('dotsHero2'),4,6);
+grid(document.getElementById('dotsMem'),4,6);
+grid(document.getElementById('dotsCta'),3,6);
+
+// scroll reveal for sections
+const io=new IntersectionObserver((es)=>{
+  es.forEach(e=>{if(e.isIntersecting){e.target.style.opacity=1;e.target.style.transform='none';e.target.style.transition='opacity .7s, transform .7s'}});
+},{threshold:.12});
+document.querySelectorAll('section .sec-kick, section .grid, .mem-inner, .layers, .pers, .cta-band').forEach(el=>{
+  el.style.opacity=0;el.style.transform='translateY(24px)';io.observe(el);
+});
+</script>
+</body>
+</html>

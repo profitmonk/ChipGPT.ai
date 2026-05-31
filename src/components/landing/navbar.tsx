@@ -2,102 +2,105 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { NAV_LINKS } from "@/lib/content";
+import { CTA_LABEL, DEMO_HREF, NAV_LINKS } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 1);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleNav = (href: string) => {
-    setMobileOpen(false);
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-  };
+  const closeMobile = () => setMobileOpen(false);
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <motion.header
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-300",
-        scrolled
-          ? "border-b border-white/10 bg-zinc-950/80 backdrop-blur-xl"
-          : "bg-transparent"
+        "fixed inset-x-0 top-0 z-50 border-b transition-colors duration-200",
+        scrolled || pathname !== "/"
+          ? "border-white/[0.08] bg-[#030303]/95 backdrop-blur-md"
+          : "border-transparent bg-transparent"
       )}
     >
-      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md border border-cyan-500/30 bg-cyan-500/10 text-xs font-bold text-cyan-300">
+      <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6 lg:px-10">
+        <Link href="/" className="flex items-center gap-3">
+          <span className="flex h-7 w-7 items-center justify-center border border-green-600/40 bg-green-950/50 text-[10px] font-semibold tracking-wider text-green-400">
             CG
           </span>
-          <span className="text-lg font-semibold tracking-tight text-white">
+          <span className="text-sm font-semibold tracking-tight text-white">
             ChipGPT
           </span>
         </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-6 lg:flex">
           {NAV_LINKS.map((link) => (
-            <button
+            <Link
               key={link.href}
-              type="button"
-              onClick={() => handleNav(link.href)}
-              className="text-sm text-zinc-400 transition-colors hover:text-white"
+              href={link.href}
+              className={cn(
+                "text-[13px] transition-colors",
+                isActive(link.href)
+                  ? "text-white"
+                  : "text-zinc-500 hover:text-white"
+              )}
             >
               {link.label}
-            </button>
+            </Link>
           ))}
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <Button variant="outline" size="sm" onClick={() => handleNav("#demo")}>
-            Request Demo
+        <div className="hidden lg:block">
+          <Button variant="outline" size="sm" asChild>
+            <Link href={DEMO_HREF}>{CTA_LABEL}</Link>
           </Button>
         </div>
 
         <button
           type="button"
-          className="text-zinc-300 md:hidden"
+          className="text-zinc-400 lg:hidden"
           onClick={() => setMobileOpen((o) => !o)}
           aria-label="Toggle menu"
         >
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </nav>
 
       {mobileOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          className="border-b border-white/10 bg-zinc-950/95 px-6 py-4 md:hidden"
-        >
+        <div className="border-t border-white/[0.08] bg-[#030303] px-6 py-5 lg:hidden">
           <div className="flex flex-col gap-4">
             {NAV_LINKS.map((link) => (
-              <button
+              <Link
                 key={link.href}
-                type="button"
-                onClick={() => handleNav(link.href)}
-                className="text-left text-sm text-zinc-300"
+                href={link.href}
+                onClick={closeMobile}
+                className={cn(
+                  "text-sm",
+                  isActive(link.href) ? "text-white" : "text-zinc-400"
+                )}
               >
                 {link.label}
-              </button>
+              </Link>
             ))}
-            <Button variant="outline" size="sm" onClick={() => handleNav("#demo")}>
-              Request Demo
+            <Button variant="outline" size="sm" asChild>
+              <Link href={DEMO_HREF} onClick={closeMobile}>
+                {CTA_LABEL}
+              </Link>
             </Button>
           </div>
-        </motion.div>
+        </div>
       )}
-    </motion.header>
+    </header>
   );
 }

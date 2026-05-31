@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SITE_DESCRIPTION } from "@/lib/content";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,13 +15,22 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ChipGPT — AI Co-Workers for the Semiconductor Lifecycle",
-  description:
-    "ChipGPT gives semiconductor teams specialized AI agents for RTL, verification, silicon bring-up, yield learning, test optimization, and FAE support.",
+  description: SITE_DESCRIPTION,
+  keywords: [
+    "semiconductor AI",
+    "engineering infrastructure",
+    "institutional memory",
+    "silicon engineering",
+  ],
   openGraph: {
     title: "ChipGPT — AI Co-Workers for the Semiconductor Lifecycle",
-    description:
-      "Build, verify, debug, and scale chips faster with governed AI co-workers across the full semiconductor lifecycle.",
+    description: SITE_DESCRIPTION,
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ChipGPT — AI Co-Workers for the Semiconductor Lifecycle",
+    description: SITE_DESCRIPTION,
   },
 };
 
@@ -34,7 +44,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} scroll-smooth`}
     >
-      <body className="min-h-screen bg-zinc-950 font-sans text-white antialiased">
+      <body className="min-h-screen bg-[#030303] font-sans text-white antialiased">
         {children}
       </body>
     </html>

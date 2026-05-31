@@ -1,38 +1,26 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { CTA_LABEL, CTA_SUPPORTING, DEMO_HREF } from "@/lib/content";
 
-export function FinalCta() {
+export function FinalCta({ compact = false }: { compact?: boolean }) {
   return (
-    <section id="demo" className="py-24 lg:py-32">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-br from-zinc-900 via-zinc-950 to-black px-8 py-16 text-center sm:px-16"
-        >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,211,238,0.12),transparent_60%)]" />
-          <div className="relative">
-            <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-cyan-400/80">
-              Early Access
-            </p>
-            <h2 className="mx-auto max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              The AI Operating Layer for Semiconductor Teams
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-              Join leading fabless and IDM programs deploying governed AI co-workers
-              across the full chip lifecycle.
-            </p>
-            <Button size="lg" className="mt-10" variant="glow">
-              Request Early Access
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </motion.div>
+    <section className="border-b border-white/[0.06]">
+      <div
+        className={`mx-auto max-w-7xl px-6 lg:px-10 ${
+          compact ? "py-20" : "py-28 lg:py-36"
+        }`}
+      >
+        <div className="max-w-2xl">
+          <h2 className="text-[1.75rem] font-semibold leading-[1.15] tracking-[-0.02em] text-white sm:text-[2rem]">
+            Accelerate Engineering Through Specialized AI Co-Workers
+          </h2>
+          <p className="mt-5 text-[15px] leading-relaxed text-zinc-500">
+            {CTA_SUPPORTING}
+          </p>
+          <Button size="lg" variant="primary" className="mt-9" asChild>
+            <Link href={DEMO_HREF}>{CTA_LABEL}</Link>
+          </Button>
+        </div>
       </div>
     </section>
   );
