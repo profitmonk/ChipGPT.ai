@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "bug_id": "hackatdac21_aes_ctr",
+  "title": "Hack@DAC 2021: AES CTR counter never increments",
+  "tagline": "One missing +1 turns AES into a fixed keystream.",
+  "hook_30s": "AES in counter mode requires a counter that increments every block. If it doesn't, your cipher becomes a one-time-pad with a fixed keystream — a known-plaintext attack recovers your secrets. This bug was inserted in a Hack@DAC SoC. ChipGPT finds it in 8 seconds.",
+  "source_url": "https://github.com/HACK-EVENT/hackatdac21",
+  "category": "22 — cryptographic implementation bug",
+  "cwe_ids": ["CWE-1240"],
+  "captured_live": false,
+  "verbatim_rtl": false,
+  "proof": {
+    "methods": ["Formal", "Simulation"],
+    "note": "Open-source formal (SymbiYosys) proves it via the combinational next-state form — ctr_d must differ from ctr_q under the increment condition — and a 2-block directed test reproduces it. The textbook temporal $past form would need commercial SVA."
+  },
+  "spec_panel": {"title": "NIST SP 800-38A — CTR Mode §6.5", "path": "spec_excerpt.md"},
+  "rtl_panel": {"title": "aes_ctr.sv", "path": "rtl_excerpt.sv"},
+  "steps": [
+    {
+      "t": 0.0, "kind": "note",
+      "agent": "Task: verify the AES CTR-mode counter in aes_ctr.sv against the NIST CTR specification."
+    },
+    {
+      "t": 1.0, "kind": "read_spec", "tool": "spec.facts",
+      "agent": "Reading NIST SP 800-38A CTR mode. Extracting the counter rule.",
+      "spec_highlight": [11, 12]
+    },
+    {
+      "t": 2.6, "kind": "read_spec",
+      "agent": "Structured fact: successive counter blocks must differ; each block increments the counter. Failure mode is severe — fixed keystream.",
+      "spec_highlight": [14, 15, 16]
+    },
+    {
+      "t": 4.0, "kind": "scan_rtl", "tool": "rtl.parse",
+      "agent": "Parsing aes_ctr.sv. Locating the next-state logic that drives the counter register ctr_q.",
+      "rtl_highlight": [11]
+    },
+    {
+      "t": 5.4, "kind": "scan_rtl",
+      "agent": "Found the combinational next-counter block.",
+      "rtl_highlight": [16, 17]
+    },
+    {
+      "t": 7.0, "kind": "locate",
+      "agent": "BUG. The next-counter value is ctr_d = ctr_q with no increment on any path. mode_ctr_i and block_done_i are inputs but never gate an increment. The counter is static: every block uses keystream block 0. CWE-1240.",
+      "rtl_highlight": [17]
+    },
+    {
+      "t": 9.0, "kind": "generate_sva", "tool": "formal.check_property",
+      "agent": "Generating the increment assertion.",
+      "artifact": {
+        "type": "sva",
+        "spec_section": "NIST SP 800-38A §6.5",
+        "explanation": "After a block completes in CTR mode, the counter must change.",
+        "sva": "assert property (@(posedge clk_i) disable iff (!rst_ni)\n  (mode_ctr_i && block_done_i) |=> (ctr_o != $past(ctr_o)));",
+        "result": "Formal (SymbiYosys z3): counterexample found via the combinational form. Sim: fails on block 2."
+      }
+    },
+    {
+      "t": 10.5, "kind": "directed_test", "tool": "sim.run",
+      "agent": "Directed test: CTR mode, encrypt two consecutive blocks, compare counter values.",
+      "artifact": {
+        "type": "directed_test",
+        "name": "t_ctr_increments_per_block",
+        "language": "systemverilog",
+        "stimulus": "mode_ctr_i=1; pulse block_done_i; sample ctr_o across two blocks.",
+        "expected": "ctr_o(block 2) != ctr_o(block 1)",
+        "result_on_buggy": "FAIL  (ctr_o unchanged — fixed keystream)",
+        "result_on_fixed": "PASS  (ctr_o increments by 1)"
+      }
+    },
+    {
+      "t": 12.0, "kind": "bug_card",
+      "agent": "Confirmed: AES CTR counter never increments.",
+      "artifact": {
+        "type": "bug_card",
+        "title": "AES CTR counter never increments",
+        "category": "22 — cryptographic implementation bug",
+        "cwe_ids": ["CWE-1240"],
+        "confidence": "confirmed",
+        "source_url": "https://github.com/HACK-EVENT/hackatdac21",
+        "root_cause": "Next-counter logic holds ctr_q; per-block increment clause absent.",
+        "fix": "Add: if (mode_ctr_i && block_done_i) ctr_d = ctr_q + 128'd1;",
+        "impact": "CTR degenerates to a fixed-keystream one-time-pad; keystream recoverable via known plaintext."
+      }
+    },
+    {
+      "t": 13.5, "kind": "traceability",
+      "agent": "Appending the traceability row.",
+      "artifact": {
+        "type": "traceability",
+        "spec_section": "NIST SP 800-38A §6.5",
+        "rtl_location": "aes_ctr.sv:17",
+        "assertion": "(mode_ctr_i && block_done_i) |=> ctr_o != $past(ctr_o)",
+        "test": "t_ctr_increments_per_block",
+        "coverage_status": "closed"
+      }
+    }
+  ]
+}

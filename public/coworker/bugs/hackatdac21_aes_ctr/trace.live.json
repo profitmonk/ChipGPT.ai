@@ -1,0 +1,136 @@
+{
+  "bug_id": "hackatdac21_aes_ctr",
+  "title": "Hack@DAC 2021: AES CTR counter never increments",
+  "hook_30s": "AES in counter mode requires a counter that increments every block. If it doesn't, your cipher becomes a one-time-pad with a fixed keystream \u2014 a known-plaintext attack recovers your secrets. This bug was inserted in a Hack@DAC SoC. ChipGPT finds it in 8 seconds.",
+  "source_url": "https://github.com/HACK-EVENT/hackatdac21",
+  "category": "22 \u2014 cryptographic implementation bug",
+  "cwe_ids": [
+    "CWE-1240"
+  ],
+  "spec_panel": {
+    "title": "NIST SP 800-38A \u2014 CTR Mode \u00a76.5",
+    "path": "spec_excerpt.md"
+  },
+  "rtl_panel": {
+    "title": "aes_ctr.sv",
+    "path": "rtl_excerpt.sv"
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "kind": "note",
+      "agent": "I'll check this RTL against the NIST SP 800-38A CTR mode spec. Let me start by extracting spec facts and parsing the RTL.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": null
+    },
+    {
+      "t": 1.7,
+      "kind": "read_spec",
+      "agent": "Reading the spec; extracting the canonicality rule.",
+      "spec_highlight": [
+        5,
+        11
+      ],
+      "rtl_highlight": [],
+      "tool": "spec.facts",
+      "artifact": null
+    },
+    {
+      "t": 3.4,
+      "kind": "scan_rtl",
+      "agent": "Spec rule found at lines 11 (successive counter blocks must differ). Let me locate the next-state logic.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": "rtl.parse",
+      "artifact": null
+    },
+    {
+      "t": 5.1,
+      "kind": "locate",
+      "agent": "In aes_ctr_counter, the next-state logic at line 18 assigns ctr_d = ctr_q unconditionally. The counter register is therefore held at its reset/init value forever; the spec-correct increment (ctr_d = ctr_q + 1 when mode_ctr_i && block_done_i) is commented out and never applied. block_done_i and mode_ctr_i are read into the module but never affect ctr_d.",
+      "spec_highlight": [],
+      "rtl_highlight": [
+        18
+      ],
+      "tool": null,
+      "artifact": null
+    },
+    {
+      "t": 6.8,
+      "kind": "generate_sva",
+      "agent": "Proving the assertion formally (SymbiYosys).",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": "formal.check_property",
+      "artifact": {
+        "type": "sva",
+        "sva": "// SPEC \u00a76.5 (line 11): successive counter blocks must differ.\nproperty p_ctr_advances;\n  @(posedge clk_i) disable iff (!rst_ni)\n  (mode_ctr_i && block_done_i) |=> (ctr_o != $past(ctr_o));\nendproperty\nassert property (p_ctr_advances);",
+        "spec_section": "NIST SP 800-38A \u00a76.5 (lines 5, 11)",
+        "explanation": "The spec states the successive counter blocks must differ, each derived by incrementing the previous. The assertion requires that, after a block completes in CTR mode, the counter output differs from its previous value. Formal BMC returned a counterexample (CEX) on the buggy RTL, proving the property is violated because ctr_d = ctr_q holds the counter.",
+        "result": "SymbiYosys (z3): counterexample found \u2014 bug proven formally"
+      }
+    },
+    {
+      "t": 8.5,
+      "kind": "directed_test",
+      "agent": "Running the directed test in the simulator.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": "sim.run",
+      "artifact": {
+        "type": "directed_test",
+        "name": "tb_ctr_advances_on_block_done",
+        "stimulus": "Reset with ctr_init_i=0x42, mode_ctr_i=1. Capture T_1 after reset. Pulse block_done_i for one cycle, four times, sampling ctr_o after each completed block; compare against the first block.",
+        "result_on_buggy": "FAIL \u2014 ctr_o stays 0x42 for all 4 blocks; 'counter did not advance; keystream reused' printed each time.",
+        "result_on_fixed": "PASS \u2014 with conditional increment, ctr_o advances to 0x43,0x44,... and never equals T_1."
+      }
+    },
+    {
+      "t": 10.2,
+      "kind": "bug_card",
+      "agent": "Confirmed.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": {
+        "type": "bug_card",
+        "title": "AES CTR counter never increments \u2014 keystream reuse across blocks",
+        "category": "Cryptographic weakness / spec-to-RTL drift",
+        "cwe_ids": [
+          "CWE-1240",
+          "CWE-323"
+        ],
+        "root_cause": "In aes_ctr_counter, the next-state logic at line 18 assigns ctr_d = ctr_q unconditionally. The counter register is therefore held at its reset/init value forever; the spec-correct increment (ctr_d = ctr_q + 1 when mode_ctr_i && block_done_i) is commented out and never applied. block_done_i and mode_ctr_i are read into the module but never affect ctr_d.",
+        "fix": "Replace line 18 with conditional increment: ctr_d = ctr_q; if (mode_ctr_i && block_done_i) ctr_d = ctr_q + 128'd1; so each successive counter block differs from the previous one as NIST SP 800-38A \u00a76.5 requires.",
+        "impact": "Every block of a CTR-mode message is enciphered with E(K, ctr) for the SAME ctr, producing an identical keystream block T_1 = T_2 = ... = T_n. CTR degenerates to a fixed-keystream one-time-pad: C_j = P_j XOR KS, so C_a XOR C_b = P_a XOR P_b leaks plaintext, and a single known plaintext block recovers the keystream and decrypts the entire message. Catastrophic confidentiality loss."
+      }
+    },
+    {
+      "t": 11.9,
+      "kind": "traceability",
+      "agent": "Appending the traceability row.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": {
+        "type": "traceability",
+        "spec_section": "NIST SP 800-38A \u00a76.5 (lines 5, 11)",
+        "rtl_location": "aes_ctr.sv:18 (ctr_d = ctr_q; in always_comb)",
+        "assertion": "p_ctr_advances: (mode_ctr_i && block_done_i) |=> (ctr_o != $past(ctr_o))",
+        "test": "tb_ctr_advances_on_block_done",
+        "coverage_status": "Proven both ways: formal CEX (symbiyosys+z3, depth 4) and directed sim FAIL (iverilog)."
+      }
+    }
+  ],
+  "captured_live": true,
+  "verbatim_rtl": false,
+  "proof": {
+    "methods": [
+      "Simulation"
+    ],
+    "note": "Temporal property ($past) \u2014 reproduced by a 2-block directed test. Open-source formal returns UNKNOWN; a formal proof needs commercial SVA (JasperGold / VC Formal)."
+  },
+  "schema_version": 1
+}
