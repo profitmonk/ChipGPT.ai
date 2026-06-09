@@ -30,6 +30,35 @@
     "captured_live": false
   },
   {
+    "bug_id": "lowrisc_wb_deadlock",
+    "title": "lowRISC three-way Wishbone bus deadlock",
+    "tagline": "A 3-master bus that can hang forever \u2014 proven by formal liveness.",
+    "hook_30s": "Three masters share a Wishbone bus. The arbiter only hands the bus to the next master when the current one lets go. But if master A waits on B, B on C, and C on A \u2014 a circular wait \u2014 nobody ever lets go, and the bus hangs forever. ChipGPT proves it with a formal liveness check.",
+    "category": "06 \u2014 FSM deadlock (multi-master fabric)",
+    "proof": {
+      "methods": [
+        "Formal",
+        "Simulation"
+      ],
+      "note": "Formal LIVENESS \u2014 proves 'a pending request is eventually granted' is violated (lasso counterexample). A directed sim confirms the hang via a watchdog timeout. Safety checks alone would miss this."
+    },
+    "captured_live": false
+  },
+  {
+    "bug_id": "opentitan_i2c_tf",
+    "title": "OpenTitan I2C fall-time (t_f) double-counting",
+    "tagline": "I2C counts the fall time twice \u2014 every clock runs too slow.",
+    "hook_30s": "The I2C controller holds SCL low for t_low plus the bus fall time \u2014 counted once. This one adds the fall time twice. Every clock cycle SCL is held low one fall-time too long, so the bus runs slower than configured and blows the timing budget. ChipGPT catches it with a directed test measuring the SCL low period.",
+    "category": "01 \u2014 combinational arithmetic (I2C timing)",
+    "proof": {
+      "methods": [
+        "Simulation"
+      ],
+      "note": "Protocol timing \u2014 the natural proof is a directed test that measures the computed SCL low period against the spec model (this is how the real OpenTitan fix shipped: with a DIF test). Formal could also check the arithmetic."
+    },
+    "captured_live": false
+  },
+  {
     "bug_id": "opentitan_lc_ctrl_cdc",
     "title": "OpenTitan lc_ctrl -> KMAC CDC missing synchronizer",
     "tagline": "A clock-domain crossing your simulator can't see.",
@@ -40,6 +69,21 @@
         "Structural"
       ],
       "note": "Invisible to RTL simulation. Found by clock-domain (structural) analysis \u2014 not simulation, not functional formal."
+    },
+    "captured_live": false
+  },
+  {
+    "bug_id": "verilog_ethernet_arp_overflow",
+    "title": "verilog-ethernet ARP retry counter integer overflow",
+    "tagline": "An 8-bit counter vs a 16-bit limit \u2014 ARP retries forever.",
+    "hook_30s": "This ARP block retries a lookup until a 16-bit retry limit, then gives up. But the counter is only 8 bits. Set a limit above 255 and the counter wraps back to zero before it ever reaches the limit \u2014 so it never gives up, and the request retries forever. ChipGPT proves the overflow formally and in simulation.",
+    "category": "15 \u2014 integer overflow / width mismatch",
+    "proof": {
+      "methods": [
+        "Formal",
+        "Simulation"
+      ],
+      "note": "Arithmetic width bug \u2014 formal finds a reachable limit where give_up never asserts; a directed test drives 300 retries and watches give_up stay low."
     },
     "captured_live": false
   }
