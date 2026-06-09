@@ -60,6 +60,9 @@ export default function DemoPage() {
                   <a href="mailto:demo@chipgpt.com">{CTA_LABEL}</a>
                 </Button>
                 <Button variant="outline" size="lg" asChild>
+                  <a href="/coworker">▶ Watch the Co-worker (Live Demo)</a>
+                </Button>
+                <Button variant="outline" size="lg" asChild>
                   <Link href="/platform">Explore Platform</Link>
                 </Button>
               </div>

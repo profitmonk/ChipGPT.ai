@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "bug_id": "cva6_sv39",
+  "title": "CVA6 Sv39 virtual-address check off-by-one",
+  "tagline": "An off-by-one in a production RISC-V virtual-memory check.",
+  "hook_30s": "This is the RISC-V Sv39 spec: virtual-address bits 63 down to 38 must all equal bit 38. This is CVA6's code: it checks bits 63 down to 39. That single off-by-one shipped in a virtual-memory protection check in a production RISC-V core. ChipGPT finds it from the spec in 14 seconds.",
+  "source_url": "https://github.com/openhwgroup/cva6/issues/136",
+  "category": "25 — spec-to-RTL drift (the #1 root cause of respins)",
+  "cwe_ids": ["CWE-1257"],
+  "captured_live": false,
+  "verbatim_rtl": false,
+  "proof": {
+    "methods": ["Formal", "Simulation"],
+    "note": "Combinational spec-drift — proven exhaustively by formal (SymbiYosys counterexample) and reproduced by a directed test."
+  },
+  "spec_panel": {"title": "RISC-V Privileged ISA — Sv39 §4.4.1", "path": "spec_excerpt.md"},
+  "rtl_panel": {"title": "load_store_unit.sv", "path": "rtl_excerpt.sv"},
+  "steps": [
+    {
+      "t": 0.0, "kind": "note",
+      "agent": "Task: check load_store_unit.sv against the RISC-V Sv39 spec for spec-to-RTL drift."
+    },
+    {
+      "t": 1.0, "kind": "read_spec", "tool": "spec.facts",
+      "agent": "Reading the Sv39 section. Extracting the canonicality rule.",
+      "spec_highlight": [7, 8, 9]
+    },
+    {
+      "t": 2.6, "kind": "read_spec",
+      "agent": "Structured fact: a valid Sv39 virtual address requires bits [63:38] to all equal bit 38 — i.e. the upper bits are all-ones or all-zeros relative to the sign bit. The reference bit is 38; the checked range starts at bit 38.",
+      "spec_highlight": [11]
+    },
+    {
+      "t": 4.4, "kind": "scan_rtl", "tool": "rtl.parse",
+      "agent": "Parsing load_store_unit.sv with pyslang. Searching the AST for the address-overflow / canonicality check on vaddr.",
+      "rtl_highlight": [10]
+    },
+    {
+      "t": 6.0, "kind": "scan_rtl",
+      "agent": "Found the reduction-based overflow check driving page_fault_o.",
+      "rtl_highlight": [15]
+    },
+    {
+      "t": 8.0, "kind": "locate",
+      "agent": "DRIFT. RTL reduces over vaddr[63:39] — (&vaddr[63:39])==1 OR (|vaddr[63:39])==0 — so the range starts at bit 39. The spec requires the range from bit 38. Bit 38 is excluded from the check. A non-canonical address whose bit 38 differs from bits[63:39] is not flagged: virtual-memory protection bypass.",
+      "rtl_highlight": [15]
+    },
+    {
+      "t": 11.0, "kind": "generate_sva", "tool": "formal.check_property",
+      "agent": "Generating the spec-faithful assertion (range from bit 38) and checking it against the RTL.",
+      "artifact": {
+        "type": "sva",
+        "spec_section": "§4.4.1",
+        "explanation": "page_fault must assert iff the upper bits are NOT uniform over [63:38] — the spec range, not [63:39].",
+        "sva": "assert property (@(posedge clk)\n  page_fault_o == !((&vaddr[63:38]) == 1'b1 || (|vaddr[63:38]) == 1'b0));",
+        "result": "FAILS on current RTL (checks [63:39]; counterexample below)"
+      }
+    },
+    {
+      "t": 12.5, "kind": "directed_test", "tool": "sim.run",
+      "agent": "Directed test: a non-canonical address with bit 38 = 1, bits[63:39] = 0. Spec says page-fault; buggy RTL does not fault.",
+      "artifact": {
+        "type": "directed_test",
+        "name": "t_noncanonical_vaddr_bit38",
+        "language": "systemverilog",
+        "stimulus": "vaddr = 64'h0000_0040_0000_0000;  // bit 38 set, bits[63:39] clear",
+        "expected": "page_fault_o == 1",
+        "result_on_buggy": "FAIL  (page_fault_o == 0  — protection bypassed)",
+        "result_on_fixed": "PASS  (page_fault_o == 1)"
+      }
+    },
+    {
+      "t": 14.0, "kind": "bug_card",
+      "agent": "Confirmed: spec-to-RTL drift in the Sv39 canonicality check.",
+      "artifact": {
+        "type": "bug_card",
+        "title": "CVA6 Sv39 virtual-address check off-by-one",
+        "category": "25 — spec-to-RTL drift",
+        "cwe_ids": ["CWE-1257"],
+        "confidence": "confirmed",
+        "source_url": "https://github.com/openhwgroup/cva6/issues/136",
+        "root_cause": "The overflow reduction spans vaddr[63:39]; the spec requires [63:38]. Bit 38 is excluded from the canonicality check.",
+        "fix": "Widen the reduction to bit 38: (&vaddr[63:38]) == 1'b1 || (|vaddr[63:38]) == 1'b0.",
+        "impact": "Non-canonical 64-bit addresses bypass virtual-memory protection."
+      }
+    },
+    {
+      "t": 15.5, "kind": "traceability",
+      "agent": "Appending the traceability row.",
+      "artifact": {
+        "type": "traceability",
+        "spec_section": "RISC-V Priv §4.4.1",
+        "rtl_location": "load_store_unit.sv:15",
+        "assertion": "page_fault_o == !((&vaddr[63:38])==1 || (|vaddr[63:38])==0)",
+        "test": "t_noncanonical_vaddr_bit38",
+        "coverage_status": "closed"
+      }
+    }
+  ]
+}

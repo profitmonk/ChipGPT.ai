@@ -1,0 +1,46 @@
+[
+  {
+    "bug_id": "cva6_sv39",
+    "title": "CVA6 Sv39 virtual-address check off-by-one",
+    "tagline": "An off-by-one in a production RISC-V virtual-memory check.",
+    "hook_30s": "This is the RISC-V Sv39 spec: virtual-address bits 63 down to 38 must all equal bit 38. This is CVA6's code: it checks bits 63 down to 39. That single off-by-one shipped in a virtual-memory protection check in a production RISC-V core. ChipGPT finds it from the spec in 14 seconds.",
+    "category": "25 \u2014 spec-to-RTL drift (the #1 root cause of respins)",
+    "proof": {
+      "methods": [
+        "Formal",
+        "Simulation"
+      ],
+      "note": "Combinational spec-drift \u2014 proven exhaustively by formal (SymbiYosys counterexample) and reproduced by a directed test."
+    },
+    "captured_live": false
+  },
+  {
+    "bug_id": "hackatdac21_aes_ctr",
+    "title": "Hack@DAC 2021: AES CTR counter never increments",
+    "tagline": "One missing +1 turns AES into a fixed keystream.",
+    "hook_30s": "AES in counter mode requires a counter that increments every block. If it doesn't, your cipher becomes a one-time-pad with a fixed keystream \u2014 a known-plaintext attack recovers your secrets. This bug was inserted in a Hack@DAC SoC. ChipGPT finds it in 8 seconds.",
+    "category": "22 \u2014 cryptographic implementation bug",
+    "proof": {
+      "methods": [
+        "Formal",
+        "Simulation"
+      ],
+      "note": "Open-source formal (SymbiYosys) proves it via the combinational next-state form \u2014 ctr_d must differ from ctr_q under the increment condition \u2014 and a 2-block directed test reproduces it. The textbook temporal $past form would need commercial SVA."
+    },
+    "captured_live": false
+  },
+  {
+    "bug_id": "opentitan_lc_ctrl_cdc",
+    "title": "OpenTitan lc_ctrl -> KMAC CDC missing synchronizer",
+    "tagline": "A clock-domain crossing your simulator can't see.",
+    "hook_30s": "This bug shipped through RTL simulation and was found in gate-level simulation \u2014 hundreds of regression hours wasted. It's a clock-domain crossing inside OpenTitan's life-cycle controller, on the path to the cryptographic accelerator. ChipGPT finds it in 23 seconds, before GLS.",
+    "category": "08 \u2014 missing/incorrect synchronizer (invisible to RTL sim)",
+    "proof": {
+      "methods": [
+        "Structural"
+      ],
+      "note": "Invisible to RTL simulation. Found by clock-domain (structural) analysis \u2014 not simulation, not functional formal."
+    },
+    "captured_live": false
+  }
+]

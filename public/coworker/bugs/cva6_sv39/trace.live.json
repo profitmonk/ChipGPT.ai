@@ -1,0 +1,132 @@
+{
+  "bug_id": "cva6_sv39",
+  "title": "CVA6 Sv39 virtual-address check off-by-one",
+  "hook_30s": "This is the RISC-V Sv39 spec: virtual-address bits 63 down to 38 must all equal bit 38. This is CVA6's code: it checks bits 63 down to 39. That single off-by-one shipped in a virtual-memory protection check in a production RISC-V core. ChipGPT finds it from the spec in 14 seconds.",
+  "source_url": "https://github.com/openhwgroup/cva6/issues/136",
+  "category": "25 \u2014 spec-to-RTL drift (the #1 root cause of respins)",
+  "cwe_ids": [
+    "CWE-1257"
+  ],
+  "spec_panel": {
+    "title": "RISC-V Privileged ISA \u2014 Sv39 \u00a74.4.1",
+    "path": "spec_excerpt.md"
+  },
+  "rtl_panel": {
+    "title": "load_store_unit.sv",
+    "path": "rtl_excerpt.sv"
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "kind": "note",
+      "agent": "I'll check this CVA6 Sv39 vaddr canonicality logic against the spec.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": null
+    },
+    {
+      "t": 1.7,
+      "kind": "read_spec",
+      "agent": "Reading the spec; extracting the canonicality rule.",
+      "spec_highlight": [
+        8
+      ],
+      "rtl_highlight": [],
+      "tool": "spec.facts",
+      "artifact": null
+    },
+    {
+      "t": 3.4,
+      "kind": "scan_rtl",
+      "agent": "Spec rule: bits 63:38 must equal bit 38 (line 8). RTL uses [63:39] at line 15 \u2014 bit 38 excluded.",
+      "spec_highlight": [],
+      "rtl_highlight": [
+        15
+      ],
+      "tool": "rtl.parse",
+      "artifact": null
+    },
+    {
+      "t": 5.1,
+      "kind": "locate",
+      "agent": "The overflow (canonicality) reduction at load_store_unit.sv:15 spans vaddr[63:39] instead of the spec-mandated vaddr[63:38]. Bit 38 \u2014 the Sv39 sign/canonical bit \u2014 is excluded from both the AND-reduction (all-ones) and OR-reduction (all-zeros) tests. As a result, an address whose bit 38 differs from bits[63:39] is judged canonical when it is not.",
+      "spec_highlight": [],
+      "rtl_highlight": [
+        15
+      ],
+      "tool": null,
+      "artifact": null
+    },
+    {
+      "t": 6.8,
+      "kind": "generate_sva",
+      "agent": "Proving the assertion formally (SymbiYosys).",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": "formal.check_property",
+      "artifact": {
+        "type": "sva",
+        "sva": "assert property (@(*) page_fault_o == !((&vaddr[63:38]) == 1'b1 || (|vaddr[63:38]) == 1'b0));",
+        "spec_section": "\u00a74.4.1",
+        "explanation": "Encodes the spec sentence 'bits 63:38 all equal bit 38, or else a page-fault occurs': page_fault_o must assert exactly when vaddr[63:38] is neither all-ones nor all-zeros. Formal check returned CEX against the buggy [63:39] RTL.",
+        "result": "SymbiYosys (z3): counterexample found \u2014 bug proven formally"
+      }
+    },
+    {
+      "t": 8.5,
+      "kind": "directed_test",
+      "agent": "Running the directed test in the simulator.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": "sim.run",
+      "artifact": {
+        "type": "directed_test",
+        "name": "sv39_canonicality_signbit_included",
+        "stimulus": "Drive vaddr and compare page_fault_o to spec model spec_pf = !((&vaddr[63:38])==1 || (|vaddr[63:38])==0). Cases: 0x0000_0040_0000_0000 (bit38=1, higher=0 -> non-canonical), 0x0, 0xFFFF_FFC0_0000_0000 (canonical high), 0xFFFF_FF80_0000_0000 (bit38=0, higher=1 -> non-canonical).",
+        "result_on_buggy": "FAIL \u2014 dut_pf=0 vs spec_pf=1 for 0x0000_0040_0000_0000 and 0xFFFF_FF80_0000_0000.",
+        "result_on_fixed": "PASS \u2014 all four vectors match the spec model."
+      }
+    },
+    {
+      "t": 10.2,
+      "kind": "bug_card",
+      "agent": "Confirmed.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": {
+        "type": "bug_card",
+        "title": "Sv39 vaddr canonicality check off-by-one ([63:39] excludes sign bit 38) \u2014 VM protection bypass",
+        "category": "Spec-to-RTL drift / memory protection",
+        "cwe_ids": [
+          "CWE-1252",
+          "CWE-1190",
+          "CWE-682"
+        ],
+        "root_cause": "The overflow (canonicality) reduction at load_store_unit.sv:15 spans vaddr[63:39] instead of the spec-mandated vaddr[63:38]. Bit 38 \u2014 the Sv39 sign/canonical bit \u2014 is excluded from both the AND-reduction (all-ones) and OR-reduction (all-zeros) tests. As a result, an address whose bit 38 differs from bits[63:39] is judged canonical when it is not.",
+        "fix": "Change the slice from [63:39] to [63:38] so the check includes the sign bit: assign overflow = !((&vaddr[63:38]) == 1'b1 || (|vaddr[63:38]) == 1'b0); (matches [XLEN-1:SV-1] = [63:38] in upstream core).",
+        "impact": "Non-canonical virtual addresses (e.g. 0x0000_0040_0000_0000 with bit38=1/high bits=0, or 0xFFFF_FF80_0000_0000 with bit38=0/high bits=1) are not flagged with the address-overflow page fault. They proceed into translation and can alias into mapped regions \u2014 a virtual-memory protection bypass and a path for software to depend on reserved high address bits."
+      }
+    },
+    {
+      "t": 11.9,
+      "kind": "traceability",
+      "agent": "Appending the traceability row.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": {
+        "type": "traceability",
+        "spec_section": "\u00a74.4.1 (line 8)",
+        "rtl_location": "load_store_unit.sv:15",
+        "assertion": "page_fault_o == !((&vaddr[63:38])==1 || (|vaddr[63:38])==0)",
+        "test": "sv39_canonicality_signbit_included",
+        "coverage_status": "Proven: formal CEX + directed sim FAIL on buggy RTL; both pass on [63:38] fix."
+      }
+    }
+  ],
+  "captured_live": true,
+  "verbatim_rtl": false,
+  "schema_version": 1
+}
