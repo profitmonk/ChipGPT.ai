@@ -279,6 +279,8 @@ async function play() {
 function stop() { state.runId++; state.playing = false; const b = $("playBtn"); if (b) b.textContent = "▶ Play"; }
 function restart() { stop(); play(); }
 
+function showLanding() { stop(); $("intro").classList.remove("hide"); }
+
 function updateLiveBtn() {
   const b = $("liveBtn");
   b.classList.toggle("on", state.live);
@@ -295,6 +297,7 @@ window.addEventListener("DOMContentLoaded", () => {
   $("bugSelect").addEventListener("change", (e) => selectBug(e.target.value));
   $("playBtn").addEventListener("click", () => (state.playing ? stop() : play()));
   $("restartBtn").addEventListener("click", restart);
+  $("bugsBtn").addEventListener("click", showLanding);
   $("liveBtn").addEventListener("click", toggleLive);
   document.addEventListener("keydown", (e) => {
     if (e.code === "Space") { e.preventDefault(); state.playing ? stop() : play(); }

@@ -13,12 +13,13 @@
  <div class="stage-wrap">
   <div id="stage">
     <header class="topbar">
-      <div class="brand">
+      <a class="brand" href="/" title="Back to chipgpt.ai">
         <svg class="chip" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4"/></svg>
         <span class="word">Chip<span class="g">GPT</span></span>
         <span class="pill">RTL/DV Co-worker</span>
-      </div>
+      </a>
       <div class="controls">
+        <button id="bugsBtn" title="Back to the bug list">☰ Bugs</button>
         <select id="bugSelect" title="Hero bug" aria-label="Hero bug"></select>
         <button id="liveBtn" title="Toggle live-captured trace">⚡ Live</button>
         <button id="playBtn" class="primary">▶ Play</button>
@@ -62,7 +63,7 @@
 
     <footer class="statusbar">
       <span id="srcLink"></span>
-      <span class="site">chipgpt.ai</span>
+      <a class="site" href="/" title="Back to chipgpt.ai">← chipgpt.ai</a>
     </footer>
 
     <!-- Landing: brand + the three hero bugs as a picker -->
