@@ -26,7 +26,7 @@
       "artifact": null
     },
     {
-      "t": 1.7,
+      "t": 2.4,
       "kind": "read_spec",
       "agent": "Reading the spec; extracting the canonicality rule.",
       "spec_highlight": [
@@ -38,7 +38,7 @@
       "artifact": null
     },
     {
-      "t": 3.4,
+      "t": 4.4,
       "kind": "scan_rtl",
       "agent": "Spec rule is at lines 8-9. Let me locate the next-state logic and confirm the rotation condition.",
       "spec_highlight": [],
@@ -47,7 +47,7 @@
       "artifact": null
     },
     {
-      "t": 5.1,
+      "t": 7.6,
       "kind": "locate",
       "agent": "The next-owner logic at wb_arbiter.sv:19 advances owner_d only inside `if (!cyc_i[owner_q])` \u2014 i.e. solely when the CURRENT owner negates its CYC_O. There is no timeout, watchdog, or preemption. If three masters form a circular wait (master 0 blocked on a response gated by master 1, 1 on 2, 2 on 0), none ever drops cyc_i, so owner_q is frozen and gnt_o stays 3'b001 forever. The waiting masters (1 and 2) are never granted.",
       "spec_highlight": [],
@@ -58,7 +58,7 @@
       "artifact": null
     },
     {
-      "t": 6.8,
+      "t": 10.6,
       "kind": "generate_sva",
       "agent": "Proving the assertion formally (SymbiYosys).",
       "spec_highlight": [],
@@ -73,7 +73,7 @@
       }
     },
     {
-      "t": 8.5,
+      "t": 13.4,
       "kind": "directed_test",
       "agent": "Running the directed test in the simulator.",
       "spec_highlight": [],
@@ -88,7 +88,7 @@
       }
     },
     {
-      "t": 10.2,
+      "t": 16.6,
       "kind": "bug_card",
       "agent": "Confirmed.",
       "spec_highlight": [],
@@ -108,7 +108,7 @@
       }
     },
     {
-      "t": 11.9,
+      "t": 19.2,
       "kind": "traceability",
       "agent": "Appending the traceability row.",
       "spec_highlight": [],

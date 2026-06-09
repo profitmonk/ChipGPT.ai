@@ -3,50 +3,89 @@
   "bug_id": "opentitan_lc_ctrl_cdc",
   "title": "OpenTitan lc_ctrl -> KMAC CDC missing synchronizer",
   "tagline": "A clock-domain crossing your simulator can't see.",
-  "hook_30s": "This bug shipped through RTL simulation and was found in gate-level simulation — hundreds of regression hours wasted. It's a clock-domain crossing inside OpenTitan's life-cycle controller, on the path to the cryptographic accelerator. ChipGPT finds it in 23 seconds, before GLS.",
+  "hook_30s": "This bug shipped through RTL simulation and was found in gate-level simulation \u2014 hundreds of regression hours wasted. It's a clock-domain crossing inside OpenTitan's life-cycle controller, on the path to the cryptographic accelerator. ChipGPT finds it in 23 seconds, before GLS.",
   "source_url": "https://github.com/lowRISC/opentitan/issues/20979",
-  "category": "08 — missing/incorrect synchronizer (invisible to RTL sim)",
-  "cwe_ids": ["CWE-1245"],
+  "category": "08 \u2014 missing/incorrect synchronizer (invisible to RTL sim)",
+  "cwe_ids": [
+    "CWE-1245"
+  ],
   "captured_live": false,
   "verbatim_rtl": false,
   "proof": {
-    "methods": ["Structural"],
-    "note": "Invisible to RTL simulation. Found by clock-domain (structural) analysis — not simulation, not functional formal."
+    "methods": [
+      "Structural"
+    ],
+    "note": "Invisible to RTL simulation. Found by clock-domain (structural) analysis \u2014 not simulation, not functional formal."
   },
-  "spec_panel": {"title": "OpenTitan CDC Methodology", "path": "spec_excerpt.md"},
-  "rtl_panel": {"title": "lc_ctrl_kmac_if.sv", "path": "rtl_excerpt.sv"},
+  "spec_panel": {
+    "title": "OpenTitan CDC Methodology",
+    "path": "spec_excerpt.md"
+  },
+  "rtl_panel": {
+    "title": "lc_ctrl_kmac_if.sv",
+    "path": "rtl_excerpt.sv"
+  },
   "steps": [
     {
-      "t": 0.0, "kind": "note",
-      "agent": "Task: CDC analysis of the lc_ctrl -> KMAC interface. Note: RTL simulation is blind to CDC bugs — this needs structural analysis of clock domains."
+      "t": 0.0,
+      "kind": "note",
+      "agent": "Task: CDC analysis of the lc_ctrl -> KMAC interface. Note: RTL simulation is blind to CDC bugs \u2014 this needs structural analysis of clock domains."
     },
     {
-      "t": 1.0, "kind": "read_spec", "tool": "spec.facts",
+      "t": 2.4,
+      "kind": "read_spec",
+      "tool": "spec.facts",
       "agent": "Reading the CDC methodology. Rule: every cross-domain signal must pass through prim_flop_2sync or a CDC handshake.",
-      "spec_highlight": [10, 11, 12, 13]
+      "spec_highlight": [
+        10,
+        11,
+        12,
+        13
+      ]
     },
     {
-      "t": 2.8, "kind": "read_spec",
+      "t": 4.8,
+      "kind": "read_spec",
       "agent": "Key point: an unsynchronized crossing is invisible to zero-delay RTL sim; it only surfaces at GLS or silicon. So we do NOT rely on simulation here.",
-      "spec_highlight": [15, 16, 17]
+      "spec_highlight": [
+        15,
+        16,
+        17
+      ]
     },
     {
-      "t": 4.6, "kind": "scan_rtl", "tool": "rtl.parse",
+      "t": 6.8,
+      "kind": "scan_rtl",
+      "tool": "rtl.parse",
       "agent": "Parsing lc_ctrl_kmac_if.sv. Enumerating clock domains: clk_io_div4_i (source), clk_main_i (destination). Tracing every signal across the boundary.",
-      "rtl_highlight": [4, 5, 7, 8]
+      "rtl_highlight": [
+        4,
+        5,
+        7,
+        8
+      ]
     },
     {
-      "t": 6.6, "kind": "scan_rtl", "tool": "cdc.report",
+      "t": 8.8,
+      "kind": "scan_rtl",
+      "tool": "cdc.report",
       "agent": "lc_token_i is generated in the io_div4 domain. Following it to its sampling flop in the main domain.",
-      "rtl_highlight": [18]
+      "rtl_highlight": [
+        18
+      ]
     },
     {
-      "t": 8.6, "kind": "locate",
+      "t": 12.0,
+      "kind": "locate",
       "agent": "CDC VIOLATION. lc_token_i (io_div4 domain) is sampled directly by token_q on clk_main_i with no synchronizer between them. No prim_flop_2sync, no handshake. 1 of the crossing signals on this interface is unsynchronized. Metastability risk into the KMAC crypto accelerator. This is the bug that escaped RTL sim and was caught in GLS.",
-      "rtl_highlight": [20]
+      "rtl_highlight": [
+        20
+      ]
     },
     {
-      "t": 11.0, "kind": "generate_sva", "tool": "formal.check_property",
+      "t": 15.0,
+      "kind": "generate_sva",
+      "tool": "formal.check_property",
       "agent": "Generating the CDC stability assertion (formal, not simulation).",
       "artifact": {
         "type": "sva",
@@ -57,23 +96,27 @@
       }
     },
     {
-      "t": 12.8, "kind": "bug_card",
+      "t": 18.2,
+      "kind": "bug_card",
       "agent": "Confirmed: unsynchronized clock-domain crossing.",
       "artifact": {
         "type": "bug_card",
         "title": "lc_ctrl -> KMAC CDC missing synchronizer",
-        "category": "08 — CDC missing synchronizer",
-        "cwe_ids": ["CWE-1245"],
+        "category": "08 \u2014 CDC missing synchronizer",
+        "cwe_ids": [
+          "CWE-1245"
+        ],
         "confidence": "confirmed",
         "source_url": "https://github.com/lowRISC/opentitan/issues/20979",
         "root_cause": "io_div4-domain signal sampled directly in the main domain; no 2-flop synchronizer.",
         "fix": "Insert prim_flop_2sync #(.Width(8)) on lc_token_i before token_q.",
         "impact": "Metastability into the KMAC crypto accelerator. Invisible to RTL sim; surfaces at GLS/silicon.",
-        "why_agent_wins": "Found by structural clock-domain analysis in seconds — the customer's RTL simulator cannot see this class of bug at all."
+        "why_agent_wins": "Found by structural clock-domain analysis in seconds \u2014 the customer's RTL simulator cannot see this class of bug at all."
       }
     },
     {
-      "t": 14.4, "kind": "traceability",
+      "t": 20.8,
+      "kind": "traceability",
       "agent": "Appending the traceability row + CDC dashboard entry.",
       "artifact": {
         "type": "traceability",

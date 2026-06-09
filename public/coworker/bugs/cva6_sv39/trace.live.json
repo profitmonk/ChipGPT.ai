@@ -26,7 +26,7 @@
       "artifact": null
     },
     {
-      "t": 1.7,
+      "t": 2.4,
       "kind": "read_spec",
       "agent": "Reading the spec; extracting the canonicality rule.",
       "spec_highlight": [
@@ -37,7 +37,7 @@
       "artifact": null
     },
     {
-      "t": 3.4,
+      "t": 4.4,
       "kind": "scan_rtl",
       "agent": "Spec rule: bits 63:38 must equal bit 38 (line 8). RTL uses [63:39] at line 15 \u2014 bit 38 excluded.",
       "spec_highlight": [],
@@ -48,7 +48,7 @@
       "artifact": null
     },
     {
-      "t": 5.1,
+      "t": 7.6,
       "kind": "locate",
       "agent": "The overflow (canonicality) reduction at load_store_unit.sv:15 spans vaddr[63:39] instead of the spec-mandated vaddr[63:38]. Bit 38 \u2014 the Sv39 sign/canonical bit \u2014 is excluded from both the AND-reduction (all-ones) and OR-reduction (all-zeros) tests. As a result, an address whose bit 38 differs from bits[63:39] is judged canonical when it is not.",
       "spec_highlight": [],
@@ -59,7 +59,7 @@
       "artifact": null
     },
     {
-      "t": 6.8,
+      "t": 10.6,
       "kind": "generate_sva",
       "agent": "Proving the assertion formally (SymbiYosys).",
       "spec_highlight": [],
@@ -74,7 +74,7 @@
       }
     },
     {
-      "t": 8.5,
+      "t": 13.4,
       "kind": "directed_test",
       "agent": "Running the directed test in the simulator.",
       "spec_highlight": [],
@@ -89,7 +89,7 @@
       }
     },
     {
-      "t": 10.2,
+      "t": 16.6,
       "kind": "bug_card",
       "agent": "Confirmed.",
       "spec_highlight": [],
@@ -110,7 +110,7 @@
       }
     },
     {
-      "t": 11.9,
+      "t": 19.2,
       "kind": "traceability",
       "agent": "Appending the traceability row.",
       "spec_highlight": [],

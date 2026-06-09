@@ -26,7 +26,7 @@
       "artifact": null
     },
     {
-      "t": 1.7,
+      "t": 2.4,
       "kind": "read_spec",
       "agent": "Reading the spec; extracting the canonicality rule.",
       "spec_highlight": [
@@ -37,7 +37,7 @@
       "artifact": null
     },
     {
-      "t": 3.4,
+      "t": 4.4,
       "kind": "scan_rtl",
       "agent": "Spec rule at line 9: every cross-domain signal must pass through a synchronizer. RTL has a sequential block clocked on `clk_main_i`. Let me run structural CDC analysis (this is the only tool that can find this \u2014 sim cannot) and locate the crossing.",
       "spec_highlight": [],
@@ -48,7 +48,7 @@
       "artifact": null
     },
     {
-      "t": 5.1,
+      "t": 7.6,
       "kind": "locate",
       "agent": "In lc_ctrl_kmac_if, lc_token_i is generated in the clk_io_div4 domain but is captured directly by a single flop (token_q) clocked on clk_main_i, with no two-flop synchronizer or CDC handshake on the io_div4 -> main crossing. Synchronizer depth = 1 (direct capture) where the spec requires depth >= 2 (prim_flop_2sync) for level/single-bit, or a full handshake for multi-bit data.",
       "spec_highlight": [],
@@ -59,7 +59,7 @@
       "artifact": null
     },
     {
-      "t": 6.8,
+      "t": 10.6,
       "kind": "generate_sva",
       "agent": "Proving the assertion formally (SymbiYosys).",
       "spec_highlight": [],
@@ -74,7 +74,7 @@
       }
     },
     {
-      "t": 8.5,
+      "t": 13.4,
       "kind": "directed_test",
       "agent": "Running the directed test in the simulator.",
       "spec_highlight": [],
@@ -89,7 +89,7 @@
       }
     },
     {
-      "t": 10.2,
+      "t": 16.6,
       "kind": "bug_card",
       "agent": "Confirmed.",
       "spec_highlight": [],
@@ -110,7 +110,7 @@
       }
     },
     {
-      "t": 11.9,
+      "t": 19.2,
       "kind": "traceability",
       "agent": "Appending the traceability row.",
       "spec_highlight": [],

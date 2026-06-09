@@ -2,57 +2,89 @@
   "schema_version": 1,
   "bug_id": "verilog_ethernet_arp_overflow",
   "title": "verilog-ethernet ARP retry counter integer overflow",
-  "tagline": "An 8-bit counter vs a 16-bit limit — ARP retries forever.",
-  "hook_30s": "This ARP block retries a lookup until a 16-bit retry limit, then gives up. But the counter is only 8 bits. Set a limit above 255 and the counter wraps back to zero before it ever reaches the limit — so it never gives up, and the request retries forever. ChipGPT proves the overflow formally and in simulation.",
+  "tagline": "An 8-bit counter vs a 16-bit limit \u2014 ARP retries forever.",
+  "hook_30s": "This ARP block retries a lookup until a 16-bit retry limit, then gives up. But the counter is only 8 bits. Set a limit above 255 and the counter wraps back to zero before it ever reaches the limit \u2014 so it never gives up, and the request retries forever. ChipGPT proves the overflow formally and in simulation.",
   "source_url": "https://github.com/alexforencich/verilog-ethernet/pull/75",
-  "category": "15 — integer overflow / width mismatch",
-  "cwe_ids": ["CWE-190"],
+  "category": "15 \u2014 integer overflow / width mismatch",
+  "cwe_ids": [
+    "CWE-190"
+  ],
   "captured_live": false,
   "verbatim_rtl": false,
   "proof": {
-    "methods": ["Formal", "Simulation"],
-    "note": "Arithmetic width bug — formal finds a reachable limit where give_up never asserts; a directed test drives 300 retries and watches give_up stay low."
+    "methods": [
+      "Formal",
+      "Simulation"
+    ],
+    "note": "Arithmetic width bug \u2014 formal finds a reachable limit where give_up never asserts; a directed test drives 300 retries and watches give_up stay low."
   },
-  "spec_panel": {"title": "ARP Retry Logic — Design Requirement", "path": "spec_excerpt.md"},
-  "rtl_panel": {"title": "arp.sv", "path": "rtl_excerpt.sv"},
+  "spec_panel": {
+    "title": "ARP Retry Logic \u2014 Design Requirement",
+    "path": "spec_excerpt.md"
+  },
+  "rtl_panel": {
+    "title": "arp.sv",
+    "path": "rtl_excerpt.sv"
+  },
   "steps": [
     {
-      "t": 0.0, "kind": "note",
+      "t": 0.0,
+      "kind": "note",
       "agent": "Task: check the ARP retry counter against its design requirement (give up at retry_limit)."
     },
     {
-      "t": 1.0, "kind": "read_spec", "tool": "spec.facts",
+      "t": 2.4,
+      "kind": "read_spec",
+      "tool": "spec.facts",
       "agent": "Reading the requirement: the retry counter must be able to represent every value up to retry_limit, or it wraps and never gives up.",
-      "spec_highlight": [7, 8, 9]
+      "spec_highlight": [
+        7,
+        8,
+        9
+      ]
     },
     {
-      "t": 2.8, "kind": "scan_rtl", "tool": "rtl.parse",
+      "t": 4.4,
+      "kind": "scan_rtl",
+      "tool": "rtl.parse",
       "agent": "Parsing arp.sv. Comparing the counter width against the limit field width.",
-      "rtl_highlight": [13]
+      "rtl_highlight": [
+        13
+      ]
     },
     {
-      "t": 4.6, "kind": "scan_rtl",
+      "t": 6.4,
+      "kind": "scan_rtl",
       "agent": "retry_q is 8 bits; retry_limit_i is 16 bits; they are compared directly.",
-      "rtl_highlight": [22]
+      "rtl_highlight": [
+        22
+      ]
     },
     {
-      "t": 6.6, "kind": "locate",
+      "t": 9.6,
+      "kind": "locate",
       "agent": "OVERFLOW. retry_q is logic [7:0] (line 13) but is compared against the 16-bit retry_limit_i (line 22). For any limit > 255, retry_q wraps 255->0 before reaching it, so give_up_o never asserts and the ARP request retries forever. CWE-190.",
-      "rtl_highlight": [13]
+      "rtl_highlight": [
+        13
+      ]
     },
     {
-      "t": 9.0, "kind": "generate_sva", "tool": "formal.check_property",
+      "t": 12.6,
+      "kind": "generate_sva",
+      "tool": "formal.check_property",
       "agent": "Generating the overflow assertion and checking it formally.",
       "artifact": {
         "type": "sva",
         "spec_section": "CWE-190 / design requirement",
-        "explanation": "If the configured limit exceeds the counter's range, give_up can never be reached — a reachable failure.",
+        "explanation": "If the configured limit exceeds the counter's range, give_up can never be reached \u2014 a reachable failure.",
         "sva": "assert property (@(posedge clk_i)\n  (retry_limit_i <= 8'hFF));  // counter can only ever represent <= 255",
-        "result": "SymbiYosys (z3): counterexample at retry_limit_i = 256 — give_up_o unreachable"
+        "result": "SymbiYosys (z3): counterexample at retry_limit_i = 256 \u2014 give_up_o unreachable"
       }
     },
     {
-      "t": 10.6, "kind": "directed_test", "tool": "sim.run",
+      "t": 15.4,
+      "kind": "directed_test",
+      "tool": "sim.run",
       "agent": "Directed test: retry_limit_i = 300, pulse req_sent_i 400 times, watch give_up_o.",
       "artifact": {
         "type": "directed_test",
@@ -60,27 +92,31 @@
         "language": "systemverilog",
         "stimulus": "retry_limit_i = 16'd300; 400 req_sent_i pulses",
         "expected": "give_up_o asserts by retry 300",
-        "result_on_buggy": "FAIL — give_up_o stays 0; retry_q wraps 255->0 (loops forever)",
-        "result_on_fixed": "PASS — 16-bit retry_q reaches 300, give_up_o asserts"
+        "result_on_buggy": "FAIL \u2014 give_up_o stays 0; retry_q wraps 255->0 (loops forever)",
+        "result_on_fixed": "PASS \u2014 16-bit retry_q reaches 300, give_up_o asserts"
       }
     },
     {
-      "t": 12.2, "kind": "bug_card",
+      "t": 18.6,
+      "kind": "bug_card",
       "agent": "Confirmed: integer-overflow / width mismatch.",
       "artifact": {
         "type": "bug_card",
         "title": "ARP retry counter integer overflow",
-        "category": "15 — integer overflow",
-        "cwe_ids": ["CWE-190"],
+        "category": "15 \u2014 integer overflow",
+        "cwe_ids": [
+          "CWE-190"
+        ],
         "confidence": "confirmed",
         "source_url": "https://github.com/alexforencich/verilog-ethernet/pull/75",
         "root_cause": "8-bit retry_q compared against a 16-bit retry_limit_i; counter wraps before reaching limits > 255.",
         "fix": "Widen retry_q to 16 bits (match the limit field).",
-        "impact": "For large retry limits the ARP lookup never abandons — the request retries forever."
+        "impact": "For large retry limits the ARP lookup never abandons \u2014 the request retries forever."
       }
     },
     {
-      "t": 13.8, "kind": "traceability",
+      "t": 21.2,
+      "kind": "traceability",
       "agent": "Appending the traceability row.",
       "artifact": {
         "type": "traceability",

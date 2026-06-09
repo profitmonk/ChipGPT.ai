@@ -26,7 +26,7 @@
       "artifact": null
     },
     {
-      "t": 1.7,
+      "t": 2.4,
       "kind": "read_spec",
       "agent": "Reading the spec; extracting the canonicality rule.",
       "spec_highlight": [
@@ -38,7 +38,7 @@
       "artifact": null
     },
     {
-      "t": 3.4,
+      "t": 4.4,
       "kind": "scan_rtl",
       "agent": "Spec rule found at lines 11 (successive counter blocks must differ). Let me locate the next-state logic.",
       "spec_highlight": [],
@@ -47,7 +47,7 @@
       "artifact": null
     },
     {
-      "t": 5.1,
+      "t": 7.6,
       "kind": "locate",
       "agent": "In aes_ctr_counter, the next-state logic at line 18 assigns ctr_d = ctr_q unconditionally. The counter register is therefore held at its reset/init value forever; the spec-correct increment (ctr_d = ctr_q + 1 when mode_ctr_i && block_done_i) is commented out and never applied. block_done_i and mode_ctr_i are read into the module but never affect ctr_d.",
       "spec_highlight": [],
@@ -58,7 +58,7 @@
       "artifact": null
     },
     {
-      "t": 6.8,
+      "t": 10.6,
       "kind": "generate_sva",
       "agent": "Proving the assertion formally (SymbiYosys).",
       "spec_highlight": [],
@@ -73,7 +73,7 @@
       }
     },
     {
-      "t": 8.5,
+      "t": 13.4,
       "kind": "directed_test",
       "agent": "Running the directed test in the simulator.",
       "spec_highlight": [],
@@ -88,7 +88,7 @@
       }
     },
     {
-      "t": 10.2,
+      "t": 16.6,
       "kind": "bug_card",
       "agent": "Confirmed.",
       "spec_highlight": [],
@@ -108,7 +108,7 @@
       }
     },
     {
-      "t": 11.9,
+      "t": 19.2,
       "kind": "traceability",
       "agent": "Appending the traceability row.",
       "spec_highlight": [],
