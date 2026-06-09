@@ -45,20 +45,21 @@ export function Navbar() {
         </Link>
 
         <div className="hidden items-center gap-6 lg:flex">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "text-[13px] transition-colors",
-                isActive(link.href)
-                  ? "text-white"
-                  : "text-zinc-500 hover:text-white"
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const cls = cn(
+              "text-[13px] transition-colors",
+              isActive(link.href) ? "text-white" : "text-zinc-500 hover:text-white"
+            );
+            return link.external ? (
+              <a key={link.href} href={link.href} className={cls}>
+                {link.label}
+              </a>
+            ) : (
+              <Link key={link.href} href={link.href} className={cls}>
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
         <div className="hidden lg:block">
@@ -80,19 +81,21 @@ export function Navbar() {
       {mobileOpen && (
         <div className="border-t border-white/[0.08] bg-[#030303] px-6 py-5 lg:hidden">
           <div className="flex flex-col gap-4">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={closeMobile}
-                className={cn(
-                  "text-sm",
-                  isActive(link.href) ? "text-white" : "text-zinc-400"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const cls = cn(
+                "text-sm",
+                isActive(link.href) ? "text-white" : "text-zinc-400"
+              );
+              return link.external ? (
+                <a key={link.href} href={link.href} onClick={closeMobile} className={cls}>
+                  {link.label}
+                </a>
+              ) : (
+                <Link key={link.href} href={link.href} onClick={closeMobile} className={cls}>
+                  {link.label}
+                </Link>
+              );
+            })}
             <Button variant="outline" size="sm" asChild>
               <Link href={DEMO_HREF} onClick={closeMobile}>
                 {CTA_LABEL}

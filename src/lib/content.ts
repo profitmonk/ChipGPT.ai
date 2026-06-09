@@ -18,7 +18,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export const NAV_LINKS = [
+export const NAV_LINKS: {
+  label: string;
+  href: string;
+  external?: boolean;
+}[] = [
   { label: "Home", href: "/" },
   { label: "Platform", href: "/platform" },
   { label: "Lifecycle", href: "/lifecycle" },
@@ -27,7 +31,10 @@ export const NAV_LINKS = [
   { label: "Outcomes", href: "/outcomes" },
   { label: "Enterprise", href: "/enterprise" },
   { label: "Blog", href: "/blog" },
-] as const;
+  // Static standalone page (served via rewrite) — must be a real navigation,
+  // so the navbar renders external links as a plain <a>.
+  { label: "Live Demo", href: "/coworker", external: true },
+];
 
 export const DEMO_HREF = "/demo";
 

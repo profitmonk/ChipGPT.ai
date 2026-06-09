@@ -6,7 +6,7 @@ import { getAllPosts } from "@/lib/blog";
 export const metadata: Metadata = {
   title: "Blog — ChipGPT",
   description:
-    "Verification engineering notes: formal vs simulation vs structural, CDC, spec-to-RTL drift, and the bug classes that cause respins.",
+    "Perspectives on the AI-native chip lifecycle, and verification engineering deep-dives on the bug classes that cause respins.",
 };
 
 export default function BlogIndexPage() {
@@ -15,8 +15,8 @@ export default function BlogIndexPage() {
     <>
       <PageHeader
         eyebrow="Blog"
-        title="Verification Engineering Notes"
-        description="Real bug classes, worked on public open-source cores — and the right way to catch each one."
+        title="Perspectives & Engineering Notes"
+        description="Where the chip industry is heading in the age of AI — and the verification engineering that gets us there."
       />
 
       <section>
