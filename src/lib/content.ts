@@ -26,6 +26,7 @@ export const NAV_LINKS = [
   { label: "Architecture", href: "/architecture" },
   { label: "Outcomes", href: "/outcomes" },
   { label: "Enterprise", href: "/enterprise" },
+  { label: "Blog", href: "/blog" },
 ] as const;
 
 export const DEMO_HREF = "/demo";
