@@ -32,6 +32,9 @@ export default async function BlogPostPage({ params }: Params) {
 
       <section>
         <div className="mx-auto max-w-3xl px-6 py-14 lg:px-10 lg:py-20">
+          {post.meta.author && (
+            <p className="mono-label mb-8 text-zinc-500">By {post.meta.author}</p>
+          )}
           <article
             className="blogpost"
             dangerouslySetInnerHTML={{ __html: post.html }}
