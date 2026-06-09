@@ -26,7 +26,7 @@
       "artifact": null
     },
     {
-      "t": 1.7,
+      "t": 2.4,
       "kind": "read_spec",
       "agent": "Reading the spec; extracting the canonicality rule.",
       "spec_highlight": [
@@ -37,7 +37,7 @@
       "artifact": null
     },
     {
-      "t": 3.4,
+      "t": 4.4,
       "kind": "scan_rtl",
       "agent": "Spec rule on line 10: t_f MUST NOT be added more than once. Now locate the RTL expression.",
       "spec_highlight": [],
@@ -46,7 +46,7 @@
       "artifact": null
     },
     {
-      "t": 5.1,
+      "t": 7.6,
       "kind": "locate",
       "agent": "In i2c_scl_low the SCL low-hold duration is computed as scl_low_o = t_low_i + t_f_i + t_f_i (i2c_timing.sv:14), adding the bus fall time t_f twice. The spec requires the fall time be accounted for exactly once: SCL low period = t_low + t_f.",
       "spec_highlight": [],
@@ -57,7 +57,7 @@
       "artifact": null
     },
     {
-      "t": 6.8,
+      "t": 10.6,
       "kind": "generate_sva",
       "agent": "Proving the assertion formally (SymbiYosys).",
       "spec_highlight": [],
@@ -72,7 +72,7 @@
       }
     },
     {
-      "t": 8.5,
+      "t": 13.4,
       "kind": "directed_test",
       "agent": "Running the directed test in the simulator.",
       "spec_highlight": [],
@@ -87,7 +87,7 @@
       }
     },
     {
-      "t": 10.2,
+      "t": 16.6,
       "kind": "bug_card",
       "agent": "Confirmed.",
       "spec_highlight": [],
@@ -106,7 +106,7 @@
       }
     },
     {
-      "t": 11.9,
+      "t": 19.2,
       "kind": "traceability",
       "agent": "Appending the traceability row.",
       "spec_highlight": [],

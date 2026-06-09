@@ -26,7 +26,7 @@
       "artifact": null
     },
     {
-      "t": 1.7,
+      "t": 2.4,
       "kind": "read_spec",
       "agent": "Reading the spec; extracting the canonicality rule.",
       "spec_highlight": [
@@ -37,7 +37,7 @@
       "artifact": null
     },
     {
-      "t": 3.4,
+      "t": 4.4,
       "kind": "scan_rtl",
       "agent": "Spec rule on line 8: counter MUST represent every value up to retry_limit. RTL `retry_q` is `[7:0]` (line 13) but `retry_limit_i` is `[15:0]`. Let me locate the comparison and counter logic.",
       "spec_highlight": [],
@@ -46,7 +46,7 @@
       "artifact": null
     },
     {
-      "t": 5.1,
+      "t": 7.6,
       "kind": "locate",
       "agent": "retry_q is declared logic [7:0] (arp.sv:13) and incremented by 8'd1, but it is compared against the 16-bit input retry_limit_i in give_up_o = (retry_q >= retry_limit_i). For any retry_limit_i > 255 the 8-bit counter wraps 255->0 before it can ever reach the limit, so the >= comparison is never satisfied.",
       "spec_highlight": [],
@@ -57,7 +57,7 @@
       "artifact": null
     },
     {
-      "t": 6.8,
+      "t": 10.6,
       "kind": "generate_sva",
       "agent": "Proving the assertion formally (SymbiYosys).",
       "spec_highlight": [],
@@ -72,7 +72,7 @@
       }
     },
     {
-      "t": 8.5,
+      "t": 13.4,
       "kind": "directed_test",
       "agent": "Running the directed test in the simulator.",
       "spec_highlight": [],
@@ -87,7 +87,7 @@
       }
     },
     {
-      "t": 10.2,
+      "t": 16.6,
       "kind": "bug_card",
       "agent": "Confirmed.",
       "spec_highlight": [],
@@ -107,7 +107,7 @@
       }
     },
     {
-      "t": 11.9,
+      "t": 19.2,
       "kind": "traceability",
       "agent": "Appending the traceability row.",
       "spec_highlight": [],
