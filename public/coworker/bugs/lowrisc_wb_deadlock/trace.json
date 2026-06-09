@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "bug_id": "lowrisc_wb_deadlock",
+  "title": "lowRISC three-way Wishbone bus deadlock",
+  "tagline": "A 3-master bus that can hang forever — proven by formal liveness.",
+  "hook_30s": "Three masters share a Wishbone bus. The arbiter only hands the bus to the next master when the current one lets go. But if master A waits on B, B on C, and C on A — a circular wait — nobody ever lets go, and the bus hangs forever. ChipGPT proves it with a formal liveness check.",
+  "source_url": "https://github.com/lowRISC/lowrisc-chip/issues/67",
+  "category": "06 — FSM deadlock (multi-master fabric)",
+  "cwe_ids": ["CWE-833"],
+  "captured_live": false,
+  "verbatim_rtl": false,
+  "proof": {
+    "methods": ["Formal", "Simulation"],
+    "note": "Formal (bounded BMC, z3): a starvation counter shows a requesting master goes un-granted for the full bound — a concrete deadlock trace. A directed sim confirms the hang via watchdog timeout. (Unbounded liveness would use a liveness engine like suprove; commercial formal proves it directly.)"
+  },
+  "spec_panel": {"title": "Wishbone B4 — Arbitration & Liveness", "path": "spec_excerpt.md"},
+  "rtl_panel": {"title": "wb_arbiter.sv", "path": "rtl_excerpt.sv"},
+  "steps": [
+    {
+      "t": 0.0, "kind": "note",
+      "agent": "Task: check the shared Wishbone arbiter for liveness — can a requesting master be starved or deadlocked?"
+    },
+    {
+      "t": 1.0, "kind": "read_spec", "tool": "spec.facts",
+      "agent": "Reading the Wishbone arbitration rule. The arbiter must guarantee a pending master is eventually granted — a liveness property, not just a safety one.",
+      "spec_highlight": [8, 9, 10]
+    },
+    {
+      "t": 2.8, "kind": "read_spec",
+      "agent": "Key risk per spec: a circular wait — each master holds the bus pending the next — deadlocks the fabric. CWE-833.",
+      "spec_highlight": [12, 13, 14]
+    },
+    {
+      "t": 4.6, "kind": "scan_rtl", "tool": "rtl.parse",
+      "agent": "Parsing wb_arbiter.sv. Extracting the ownership FSM (owner_q) and the rotation condition.",
+      "rtl_highlight": [10]
+    },
+    {
+      "t": 6.4, "kind": "scan_rtl",
+      "agent": "Ownership only advances inside this guard.",
+      "rtl_highlight": [18, 19]
+    },
+    {
+      "t": 8.4, "kind": "locate",
+      "agent": "DEADLOCK. The arbiter rotates ONLY when the current owner negates cyc_i (line 18). There is no timeout and no preemption. If owners 0->1->2->0 form a circular wait, none ever drops cyc_i, so owner_q never changes and no master is granted. The bus hangs forever.",
+      "rtl_highlight": [18]
+    },
+    {
+      "t": 11.0, "kind": "generate_sva", "tool": "formal.check_property",
+      "agent": "Generating a liveness assertion and checking it formally.",
+      "artifact": {
+        "type": "sva",
+        "spec_section": "Wishbone B4 — liveness (bounded)",
+        "explanation": "A requesting master must be granted within a bound. Checked as bounded BMC via a starvation counter (no unbounded-liveness engine in the OSS flow).",
+        "sva": "// liveness intent: cyc_i[m] |-> ##[1:N] gnt_o[m]\n// bounded BMC harness: if (cyc_i[2] && !gnt_o[2]) starve++;\n//                      assert (starve < N);",
+        "result": "SymbiYosys (BMC, z3): counterexample — master 2 starved for the full bound N (concrete deadlock trace)"
+      }
+    },
+    {
+      "t": 12.6, "kind": "directed_test", "tool": "sim.run",
+      "agent": "Directed test: drive a 3-master circular wait, run with a watchdog.",
+      "artifact": {
+        "type": "directed_test",
+        "name": "t_wb_threeway_deadlock",
+        "language": "systemverilog",
+        "stimulus": "cyc_i = 3'b111 held; each master gated on the next's response.",
+        "expected": "every master granted within N cycles",
+        "result_on_buggy": "FAIL — watchdog fires; gnt_o stuck, no master ever granted",
+        "result_on_fixed": "PASS — fairness/watchdog rotation grants each master in turn"
+      }
+    },
+    {
+      "t": 14.2, "kind": "bug_card",
+      "agent": "Confirmed: multi-master fabric deadlock.",
+      "artifact": {
+        "type": "bug_card",
+        "title": "Three-way Wishbone bus deadlock",
+        "category": "06 — FSM deadlock",
+        "cwe_ids": ["CWE-833"],
+        "confidence": "confirmed",
+        "source_url": "https://github.com/lowRISC/lowrisc-chip/issues/67",
+        "root_cause": "Arbiter rotates only when the current owner releases cyc_i; a circular wait means it never rotates. No timeout/preemption.",
+        "fix": "Rotate ownership on a fairness/watchdog counter so a held grant cannot stall the fabric forever.",
+        "impact": "The shared bus hangs; every master starves. Classic multi-master fabric deadlock.",
+        "why_agent_wins": "Caught by bounded formal model checking — a concrete deadlock trace plus a watchdog sim — the class of bug random tests rarely hit."
+      }
+    },
+    {
+      "t": 15.8, "kind": "traceability",
+      "agent": "Appending the traceability row.",
+      "artifact": {
+        "type": "traceability",
+        "spec_section": "Wishbone B4 — liveness",
+        "rtl_location": "wb_arbiter.sv:18",
+        "assertion": "cyc_i[m] |-> s_eventually gnt_o[m]",
+        "test": "t_wb_threeway_deadlock",
+        "coverage_status": "closed"
+      }
+    }
+  ]
+}

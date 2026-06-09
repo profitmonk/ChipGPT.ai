@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "bug_id": "opentitan_i2c_tf",
+  "title": "OpenTitan I2C fall-time (t_f) double-counting",
+  "tagline": "I2C counts the fall time twice — every clock runs too slow.",
+  "hook_30s": "The I2C controller holds SCL low for t_low plus the bus fall time — counted once. This one adds the fall time twice. Every clock cycle SCL is held low one fall-time too long, so the bus runs slower than configured and blows the timing budget. ChipGPT catches it with a directed test measuring the SCL low period.",
+  "source_url": "https://github.com/lowRISC/opentitan/issues/18492",
+  "category": "01 — combinational arithmetic (I2C timing)",
+  "cwe_ids": ["CWE-1298"],
+  "captured_live": false,
+  "verbatim_rtl": false,
+  "proof": {
+    "methods": ["Simulation"],
+    "note": "Protocol timing — the natural proof is a directed test that measures the computed SCL low period against the spec model (this is how the real OpenTitan fix shipped: with a DIF test). Formal could also check the arithmetic."
+  },
+  "spec_panel": {"title": "I2C Timing — SCL Low Period", "path": "spec_excerpt.md"},
+  "rtl_panel": {"title": "i2c_timing.sv", "path": "rtl_excerpt.sv"},
+  "steps": [
+    {
+      "t": 0.0, "kind": "note",
+      "agent": "Task: check the I2C SCL low-period computation against the spec timing model."
+    },
+    {
+      "t": 1.0, "kind": "read_spec", "tool": "spec.facts",
+      "agent": "Reading the I2C timing rule: SCL low period = t_low + t_f, with the fall time counted exactly once.",
+      "spec_highlight": [8, 9]
+    },
+    {
+      "t": 2.8, "kind": "scan_rtl", "tool": "rtl.parse",
+      "agent": "Parsing i2c_timing.sv. Inspecting the scl_low_o expression.",
+      "rtl_highlight": [15]
+    },
+    {
+      "t": 5.0, "kind": "locate",
+      "agent": "BUG. scl_low_o = t_low_i + t_f_i + t_f_i — the fall time t_f is added TWICE. The spec says once (t_low + t_f). SCL is held low one extra t_f every cycle, so the bus runs slower than configured and the timing budget is violated. CWE-1298.",
+      "rtl_highlight": [15]
+    },
+    {
+      "t": 7.6, "kind": "directed_test", "tool": "sim.run",
+      "agent": "Directed test: drive t_low and t_f, compare scl_low_o against the spec model t_low + t_f.",
+      "artifact": {
+        "type": "directed_test",
+        "name": "t_i2c_scl_low_period",
+        "language": "systemverilog",
+        "stimulus": "t_low_i = 100, t_f_i = 12; expect scl_low_o == 112",
+        "expected": "scl_low_o == t_low_i + t_f_i (112)",
+        "result_on_buggy": "FAIL — scl_low_o = 124 (= 100 + 12 + 12), one t_f too long",
+        "result_on_fixed": "PASS — scl_low_o = 112"
+      }
+    },
+    {
+      "t": 9.2, "kind": "generate_sva", "tool": "formal.check_property",
+      "agent": "Pinning the spec-correct relation as an assertion (also formally checkable).",
+      "artifact": {
+        "type": "sva",
+        "spec_section": "I2C SCL low period",
+        "explanation": "SCL low must equal t_low plus exactly one fall time.",
+        "sva": "assert property (@(*)\n  scl_low_o == (t_low_i + t_f_i));",
+        "result": "Violated by current RTL (t_f counted twice); directed sim is the primary proof here."
+      }
+    },
+    {
+      "t": 10.8, "kind": "bug_card",
+      "agent": "Confirmed: fall-time double-counting.",
+      "artifact": {
+        "type": "bug_card",
+        "title": "I2C fall-time (t_f) double-counting",
+        "category": "01 — combinational arithmetic (timing)",
+        "cwe_ids": ["CWE-1298"],
+        "confidence": "confirmed",
+        "source_url": "https://github.com/lowRISC/opentitan/issues/18492",
+        "root_cause": "scl_low = t_low + t_f + t_f; the fall time is added twice instead of once.",
+        "fix": "scl_low = t_low + t_f (count the fall time once) — OpenTitan PR #21765.",
+        "impact": "SCL held low one t_f too long every cycle; bus slower than configured, timing budget violated."
+      }
+    },
+    {
+      "t": 12.4, "kind": "traceability",
+      "agent": "Appending the traceability row.",
+      "artifact": {
+        "type": "traceability",
+        "spec_section": "I2C SCL low period",
+        "rtl_location": "i2c_timing.sv:15",
+        "assertion": "scl_low_o == t_low_i + t_f_i",
+        "test": "t_i2c_scl_low_period",
+        "coverage_status": "closed"
+      }
+    }
+  ]
+}
