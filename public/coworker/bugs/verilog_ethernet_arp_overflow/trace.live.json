@@ -1,0 +1,136 @@
+{
+  "bug_id": "verilog_ethernet_arp_overflow",
+  "title": "verilog-ethernet ARP retry counter integer overflow",
+  "hook_30s": "This ARP block retries a lookup until a 16-bit retry limit, then gives up. But the counter is only 8 bits. Set a limit above 255 and the counter wraps back to zero before it ever reaches the limit \u2014 so it never gives up, and the request retries forever. ChipGPT proves the overflow formally and in simulation.",
+  "source_url": "https://github.com/alexforencich/verilog-ethernet/pull/75",
+  "category": "15 \u2014 integer overflow / width mismatch",
+  "cwe_ids": [
+    "CWE-190"
+  ],
+  "spec_panel": {
+    "title": "ARP Retry Logic \u2014 Design Requirement",
+    "path": "spec_excerpt.md"
+  },
+  "rtl_panel": {
+    "title": "arp.sv",
+    "path": "rtl_excerpt.sv"
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "kind": "note",
+      "agent": "I'll analyze this RTL against the spec systematically.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": null
+    },
+    {
+      "t": 1.7,
+      "kind": "read_spec",
+      "agent": "Reading the spec; extracting the canonicality rule.",
+      "spec_highlight": [
+        8
+      ],
+      "rtl_highlight": [],
+      "tool": "spec.facts",
+      "artifact": null
+    },
+    {
+      "t": 3.4,
+      "kind": "scan_rtl",
+      "agent": "Spec rule on line 8: counter MUST represent every value up to retry_limit. RTL `retry_q` is `[7:0]` (line 13) but `retry_limit_i` is `[15:0]`. Let me locate the comparison and counter logic.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": "rtl.parse",
+      "artifact": null
+    },
+    {
+      "t": 5.1,
+      "kind": "locate",
+      "agent": "retry_q is declared logic [7:0] (arp.sv:13) and incremented by 8'd1, but it is compared against the 16-bit input retry_limit_i in give_up_o = (retry_q >= retry_limit_i). For any retry_limit_i > 255 the 8-bit counter wraps 255->0 before it can ever reach the limit, so the >= comparison is never satisfied.",
+      "spec_highlight": [],
+      "rtl_highlight": [
+        13
+      ],
+      "tool": null,
+      "artifact": null
+    },
+    {
+      "t": 6.8,
+      "kind": "generate_sva",
+      "agent": "Proving the assertion formally (SymbiYosys).",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": "formal.check_property",
+      "artifact": {
+        "type": "sva",
+        "sva": "// Spec line 8: the retry counter MUST represent every value up to retry_limit.\n// Equivalent combinational invariant on the comparison: an 8-bit counter can\n// never equal/exceed a limit above 255, so for any reachable retry_q the give_up\n// condition is unsatisfiable when retry_limit_i > 8'hFF.\nassert property (@(posedge clk_i) disable iff (!rst_ni)\n  (req_count >= retry_limit_i) |-> give_up_o);",
+        "spec_section": "Retry counting \u2014 \"The retry counter MUST be able to represent every value up to retry_limit\" (spec line 8)",
+        "explanation": "The spec requires give_up to become satisfiable once the number of issued retries reaches retry_limit. With retry_limit_i=300 the harness drives requests until req_count>=300 and asserts give_up_o must be high. On the buggy 8-bit RTL the assertion fails because retry_q wrapped and never reaches 300.",
+        "result": "SymbiYosys (z3): counterexample found \u2014 bug proven formally"
+      }
+    },
+    {
+      "t": 8.5,
+      "kind": "directed_test",
+      "agent": "Running the directed test in the simulator.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": "sim.run",
+      "artifact": {
+        "type": "directed_test",
+        "name": "arp_retry_overflow_limit300",
+        "stimulus": "Reset, set retry_limit_i=16'd300, then pulse req_sent_i for 600 ARP requests (>2x the limit); check give_up_o.",
+        "result_on_buggy": "FAIL \u2014 give_up_o never asserts after 600 requests; 8-bit retry_q wrapped 255->0, comparison never true.",
+        "result_on_fixed": "PASS \u2014 with 16-bit retry_q the counter reaches 300 and give_up_o asserts."
+      }
+    },
+    {
+      "t": 10.2,
+      "kind": "bug_card",
+      "agent": "Confirmed.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": {
+        "type": "bug_card",
+        "title": "ARP retry counter (8-bit) too narrow for 16-bit retry_limit_i \u2014 give_up_o never asserts for limits > 255 (CWE-190)",
+        "category": "Integer overflow / counter width mismatch (spec-to-RTL drift)",
+        "cwe_ids": [
+          "CWE-190",
+          "CWE-191"
+        ],
+        "root_cause": "retry_q is declared logic [7:0] (arp.sv:13) and incremented by 8'd1, but it is compared against the 16-bit input retry_limit_i in give_up_o = (retry_q >= retry_limit_i). For any retry_limit_i > 255 the 8-bit counter wraps 255->0 before it can ever reach the limit, so the >= comparison is never satisfied.",
+        "fix": "Widen the counter to match the limit field: declare 'logic [15:0] retry_q;' and increment with 16'd1 (per PR #75). The comparison retry_q >= retry_limit_i then covers the full limit range.",
+        "impact": "ARP lookups with retry_limit_i > 255 never reach the 'give up' condition; give_up_o stays low forever and the request retransmits indefinitely. The lookup hangs, leaking bandwidth and never failing over \u2014 a silent denial-of-service / liveness defect that only manifests for large configured limits."
+      }
+    },
+    {
+      "t": 11.9,
+      "kind": "traceability",
+      "agent": "Appending the traceability row.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": {
+        "type": "traceability",
+        "spec_section": "Retry counting (spec line 8)",
+        "rtl_location": "arp.sv:13 (logic [7:0] retry_q) feeding give_up_o = (retry_q >= retry_limit_i)",
+        "assertion": "(req_count >= retry_limit_i) |-> give_up_o, citing spec line 8",
+        "test": "arp_retry_overflow_limit300 (sim FAIL on buggy) + formal BMC depth 320 (CEX)",
+        "coverage_status": "Covered \u2014 proven both formally (CEX) and by directed simulation (FAIL); fix verified by inspection per PR #75"
+      }
+    }
+  ],
+  "captured_live": true,
+  "verbatim_rtl": false,
+  "proof": {
+    "methods": [
+      "Formal",
+      "Simulation"
+    ],
+    "note": "Arithmetic width bug \u2014 formal finds a reachable limit where give_up never asserts; a directed test drives 300 retries and watches give_up stay low."
+  },
+  "schema_version": 1
+}

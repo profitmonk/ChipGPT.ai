@@ -40,7 +40,7 @@
         "Formal",
         "Simulation"
       ],
-      "note": "Formal LIVENESS \u2014 proves 'a pending request is eventually granted' is violated (lasso counterexample). A directed sim confirms the hang via a watchdog timeout. Safety checks alone would miss this."
+      "note": "Formal (bounded BMC, z3): a starvation counter shows a requesting master goes un-granted for the full bound \u2014 a concrete deadlock trace. A directed sim confirms the hang via watchdog timeout. (Unbounded liveness would use a liveness engine like suprove; commercial formal proves it directly.)"
     },
     "captured_live": false
   },

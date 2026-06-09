@@ -11,7 +11,7 @@
   "verbatim_rtl": false,
   "proof": {
     "methods": ["Formal", "Simulation"],
-    "note": "Formal LIVENESS — proves 'a pending request is eventually granted' is violated (lasso counterexample). A directed sim confirms the hang via a watchdog timeout. Safety checks alone would miss this."
+    "note": "Formal (bounded BMC, z3): a starvation counter shows a requesting master goes un-granted for the full bound — a concrete deadlock trace. A directed sim confirms the hang via watchdog timeout. (Unbounded liveness would use a liveness engine like suprove; commercial formal proves it directly.)"
   },
   "spec_panel": {"title": "Wishbone B4 — Arbitration & Liveness", "path": "spec_excerpt.md"},
   "rtl_panel": {"title": "wb_arbiter.sv", "path": "rtl_excerpt.sv"},
@@ -50,10 +50,10 @@
       "agent": "Generating a liveness assertion and checking it formally.",
       "artifact": {
         "type": "sva",
-        "spec_section": "Wishbone B4 — liveness",
-        "explanation": "Every master that requests the bus must eventually be granted.",
-        "sva": "assert property (@(posedge clk_i) disable iff (!rst_ni)\n  cyc_i[2] |-> s_eventually gnt_o[2]);",
-        "result": "SymbiYosys (mode live): FAILS — lasso counterexample (3-way circular wait, gnt_o[2] never asserts)"
+        "spec_section": "Wishbone B4 — liveness (bounded)",
+        "explanation": "A requesting master must be granted within a bound. Checked as bounded BMC via a starvation counter (no unbounded-liveness engine in the OSS flow).",
+        "sva": "// liveness intent: cyc_i[m] |-> ##[1:N] gnt_o[m]\n// bounded BMC harness: if (cyc_i[2] && !gnt_o[2]) starve++;\n//                      assert (starve < N);",
+        "result": "SymbiYosys (BMC, z3): counterexample — master 2 starved for the full bound N (concrete deadlock trace)"
       }
     },
     {
@@ -82,7 +82,7 @@
         "root_cause": "Arbiter rotates only when the current owner releases cyc_i; a circular wait means it never rotates. No timeout/preemption.",
         "fix": "Rotate ownership on a fairness/watchdog counter so a held grant cannot stall the fabric forever.",
         "impact": "The shared bus hangs; every master starves. Classic multi-master fabric deadlock.",
-        "why_agent_wins": "Caught by a formal LIVENESS proof — the class of bug pure safety checks and most directed tests miss."
+        "why_agent_wins": "Caught by bounded formal model checking — a concrete deadlock trace plus a watchdog sim — the class of bug random tests rarely hit."
       }
     },
     {

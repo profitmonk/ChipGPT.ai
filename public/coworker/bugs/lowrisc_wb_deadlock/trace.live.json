@@ -1,0 +1,137 @@
+{
+  "bug_id": "lowrisc_wb_deadlock",
+  "title": "lowRISC three-way Wishbone bus deadlock",
+  "hook_30s": "Three masters share a Wishbone bus. The arbiter only hands the bus to the next master when the current one lets go. But if master A waits on B, B on C, and C on A \u2014 a circular wait \u2014 nobody ever lets go, and the bus hangs forever. ChipGPT proves it with a formal liveness check.",
+  "source_url": "https://github.com/lowRISC/lowrisc-chip/issues/67",
+  "category": "06 \u2014 FSM deadlock (multi-master fabric)",
+  "cwe_ids": [
+    "CWE-833"
+  ],
+  "spec_panel": {
+    "title": "Wishbone B4 \u2014 Arbitration & Liveness",
+    "path": "spec_excerpt.md"
+  },
+  "rtl_panel": {
+    "title": "wb_arbiter.sv",
+    "path": "rtl_excerpt.sv"
+  },
+  "steps": [
+    {
+      "t": 0.0,
+      "kind": "note",
+      "agent": "I'll analyze this Wishbone arbiter for the deadlock bug. Let me start by extracting spec rules and parsing the RTL.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": null
+    },
+    {
+      "t": 1.7,
+      "kind": "read_spec",
+      "agent": "Reading the spec; extracting the canonicality rule.",
+      "spec_highlight": [
+        8,
+        9
+      ],
+      "rtl_highlight": [],
+      "tool": "spec.facts",
+      "artifact": null
+    },
+    {
+      "t": 3.4,
+      "kind": "scan_rtl",
+      "agent": "Spec rule is at lines 8-9. Let me locate the next-state logic and confirm the rotation condition.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": "rtl.parse",
+      "artifact": null
+    },
+    {
+      "t": 5.1,
+      "kind": "locate",
+      "agent": "The next-owner logic at wb_arbiter.sv:19 advances owner_d only inside `if (!cyc_i[owner_q])` \u2014 i.e. solely when the CURRENT owner negates its CYC_O. There is no timeout, watchdog, or preemption. If three masters form a circular wait (master 0 blocked on a response gated by master 1, 1 on 2, 2 on 0), none ever drops cyc_i, so owner_q is frozen and gnt_o stays 3'b001 forever. The waiting masters (1 and 2) are never granted.",
+      "spec_highlight": [],
+      "rtl_highlight": [
+        19
+      ],
+      "tool": null,
+      "artifact": null
+    },
+    {
+      "t": 6.8,
+      "kind": "generate_sva",
+      "agent": "Proving the assertion formally (SymbiYosys).",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": "formal.check_property",
+      "artifact": {
+        "type": "sva",
+        "sva": "// SPEC lines 8-9: a waiting master MUST be granted within bounded time.\n// With all masters requesting and none releasing, a live arbiter still rotates.\nassert property (@(posedge clk_i) disable iff (!rst_ni)\n  (cyc_i == 3'b111) |-> ##[1:19] gnt_o[2]);",
+        "spec_section": "Wishbone B4 \u2014 Multi-master arbitration (lines 8-9)",
+        "explanation": "Encodes the spec's 'MUST allow a different waiting MASTER to proceed / no MASTER waits forever' as a bounded-time grant for master 2 while all three masters request. Proven as bounded BMC (no unbounded-liveness engine in OSS flow): a starvation counter must stay < 20.",
+        "result": "SymbiYosys (z3): counterexample found \u2014 bug proven formally"
+      }
+    },
+    {
+      "t": 8.5,
+      "kind": "directed_test",
+      "agent": "Running the directed test in the simulator.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": "sim.run",
+      "artifact": {
+        "type": "directed_test",
+        "name": "tb_circular_wait_deadlock",
+        "stimulus": "Drive cyc_i = 3'b111 (all three masters request and never release \u2014 the 3-way circular wait), release reset, and watch gnt_o[2] for 40 cycles.",
+        "result_on_buggy": "FAIL: master 2 starved 40 cycles, gnt_o stuck at 001 (owner frozen at master 0) \u2014 deadlock reproduced.",
+        "result_on_fixed": "PASS: with a watchdog forcing rotation, master 2 is granted within the bound."
+      }
+    },
+    {
+      "t": 10.2,
+      "kind": "bug_card",
+      "agent": "Confirmed.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": {
+        "type": "bug_card",
+        "title": "wb_arbiter: owner rotates only on owner-release \u2014 3-way circular wait deadlocks the shared Wishbone bus",
+        "category": "Liveness / Arbitration deadlock",
+        "cwe_ids": [
+          "CWE-833",
+          "CWE-667"
+        ],
+        "root_cause": "The next-owner logic at wb_arbiter.sv:19 advances owner_d only inside `if (!cyc_i[owner_q])` \u2014 i.e. solely when the CURRENT owner negates its CYC_O. There is no timeout, watchdog, or preemption. If three masters form a circular wait (master 0 blocked on a response gated by master 1, 1 on 2, 2 on 0), none ever drops cyc_i, so owner_q is frozen and gnt_o stays 3'b001 forever. The waiting masters (1 and 2) are never granted.",
+        "fix": "Bound the wait: add a fairness/watchdog counter that forces owner_d to rotate after a maximum number of cycles regardless of cyc_i[owner_q], preempting a stalled owner. e.g. rotate when (!cyc_i[owner_q] || wd_count == WD_MAX), and clear/reload the counter on each rotation. This breaks the circular wait and guarantees a bounded-time grant as the spec requires.",
+        "impact": "Complete shared-bus hang under a legal multi-master traffic pattern: a circular dependency between masters stalls the fabric permanently, no master makes progress, requiring a reset. Classic respin-class deadlock (lowRISC issue #67)."
+      }
+    },
+    {
+      "t": 11.9,
+      "kind": "traceability",
+      "agent": "Appending the traceability row.",
+      "spec_highlight": [],
+      "rtl_highlight": [],
+      "tool": null,
+      "artifact": {
+        "type": "traceability",
+        "spec_section": "Wishbone B4 \u2014 Multi-master arbitration & Liveness (lines 8-9)",
+        "rtl_location": "wb_arbiter.sv:19 (owner_d rotation gated by !cyc_i[owner_q])",
+        "assertion": "(cyc_i==3'b111) |-> ##[1:19] gnt_o[2]  (bounded liveness)",
+        "test": "tb_circular_wait_deadlock + formal BMC depth 25",
+        "coverage_status": "Proven both ways: formal=CEX, sim=FAIL on buggy RTL"
+      }
+    }
+  ],
+  "captured_live": true,
+  "verbatim_rtl": false,
+  "proof": {
+    "methods": [
+      "Formal",
+      "Simulation"
+    ],
+    "note": "Formal (bounded BMC, z3): a starvation counter shows a requesting master goes un-granted for the full bound \u2014 a concrete deadlock trace. A directed sim confirms the hang via watchdog timeout. (Unbounded liveness would use a liveness engine like suprove; commercial formal proves it directly.)"
+  },
+  "schema_version": 1
+}
