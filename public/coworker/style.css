@@ -214,3 +214,57 @@ body {
 ::-webkit-scrollbar { width: 11px; height: 11px; }
 ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
+
+/* ============================================================
+   MOBILE / NARROW (<= 900px) — responsive stacked layout.
+   Desktop 1920x1080 recording mode above is untouched.
+   ============================================================ */
+@media (max-width: 900px) {
+  html, body { height: auto; overflow: auto; -webkit-text-size-adjust: 100%; }
+  .stage-wrap { position: static; display: block; min-height: 100vh; padding: 0; }
+  #stage {
+    width: 100%; height: auto; min-height: 100vh;
+    transform: none !important; box-shadow: none; display: flex; flex-direction: column;
+  }
+
+  /* topbar wraps; drop the pill to save room */
+  .topbar { flex-wrap: wrap; gap: 10px; padding: 12px 14px; position: sticky; top: 0; z-index: 6; }
+  .brand .word { font-size: 20px; }
+  .brand .chip { width: 26px; height: 26px; }
+  .pill { display: none; }
+  .controls { width: 100%; flex-wrap: wrap; gap: 8px; }
+  .controls select, .controls button { font-size: 13px; padding: 10px 12px; }
+  .controls #bugSelect { flex: 1 1 100%; max-width: none; order: -1; }
+  .speed { font-size: 12px; }
+
+  .hook { font-size: 15px; line-height: 1.45; padding: 12px 14px; flex-wrap: wrap; }
+  .hook::before { font-size: 26px; }
+  .proof { margin-left: 0; margin-top: 8px; flex-wrap: wrap; }
+
+  /* stack the three panels; each scrolls internally so the page doesn't jump */
+  .panels { display: flex; flex-direction: column; gap: 1px; }
+  .panel { flex: none; min-width: 0; }
+  .panel-head { padding: 11px 14px; font-size: 13px; }
+  .code { height: 40vh; flex: none; font-size: 13px; padding: 10px 0; }
+  .code.spotlight .ln:not(.hl):not(.spec-hl):not(.bug) { opacity: 1; filter: none; } /* no dimming on mobile */
+  .ln { padding: 1px 14px; }
+  .ln .gutter { width: 26px; margin-right: 10px; }
+  .transcript { height: 40vh; flex: none; font-size: 14px; padding: 12px 14px; }
+
+  /* artifacts stack full-width */
+  .artifacts { height: auto; max-height: none; }
+  .artifact-rail { flex-direction: column; padding: 14px; gap: 12px; }
+  .card { min-width: 0; max-width: none; }
+
+  .statusbar { flex-wrap: wrap; gap: 6px 14px; padding: 11px 14px; font-size: 11px; }
+
+  /* landing / bug picker: single column, scrollable */
+  .intro { position: fixed; overflow-y: auto; align-items: flex-start; }
+  .landing { width: 100%; padding: 28px 16px 40px; }
+  .intro-brand { font-size: 30px; gap: 12px; margin-bottom: 14px; }
+  .intro-brand .chip { width: 32px; height: 32px; }
+  .landing .tagline { font-size: 17px; margin-bottom: 26px; }
+  .bug-cards { grid-template-columns: 1fr; gap: 14px; }
+  .bug-card-btn { padding: 18px 16px; }
+  .bc-title { font-size: 17px; }
+}

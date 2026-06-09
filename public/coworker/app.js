@@ -11,9 +11,12 @@ const KIND_LABEL = {
 let state = { trace: null, runId: 0, playing: false, speed: 1, live: false, bugId: null };
 
 // ---------- lock the 1920x1080 stage, scale to fit the window ----------
+const MOBILE_BP = 900;   // below this: responsive stacked layout (CSS @media takes over)
+
 function fitStage() {
   const s = $("stage");
   if (!s) return;
+  if (window.innerWidth <= MOBILE_BP) { s.style.transform = "none"; return; } // mobile: CSS handles layout
   const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
   s.style.transform = `scale(${scale})`;
 }
@@ -175,7 +178,11 @@ function highlight(elId, nums, cls) {
   $(elId).classList.add("spotlight");
   nums.forEach((n) => {
     const ln = $(`${elId}-l${n}`);
-    if (ln) { ln.classList.add(cls); ln.scrollIntoView({ block: "center", behavior: "smooth" }); }
+    if (!ln) return;
+    ln.classList.add(cls);
+    // Desktop: auto-center the line. Mobile: skip (avoids the page jumping between
+    // the stacked panels on every step); the highlight color still shows.
+    if (window.innerWidth > MOBILE_BP) ln.scrollIntoView({ block: "center", behavior: "smooth" });
   });
 }
 
