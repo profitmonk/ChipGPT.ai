@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [{ source: "/coworker", destination: "/coworker/index.html" }];
   },
+  // /blogs (and /blogs/<slug>) -> /blog — the public teaser links to /blogs.
+  async redirects() {
+    return [
+      { source: "/blogs", destination: "/blog", permanent: false },
+      { source: "/blogs/:slug", destination: "/blog/:slug", permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;

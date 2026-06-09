@@ -8,6 +8,8 @@ export type PostMeta = {
   title: string;
   description: string;
   date: string;
+  author?: string;
+  featured?: boolean;
 };
 
 function parseFrontmatter(raw: string): {
@@ -153,9 +155,15 @@ export function getAllPosts(): PostMeta[] {
         title: meta.title || f,
         description: meta.description || "",
         date: meta.date || "",
+        author: meta.author || undefined,
+        featured: meta.featured === "true",
       };
     })
-    .sort((a, b) => (a.date < b.date ? 1 : -1));
+    // Featured posts pin to the top, then newest-first by date.
+    .sort((a, b) => {
+      if (a.featured !== b.featured) return a.featured ? -1 : 1;
+      return a.date < b.date ? 1 : -1;
+    });
 }
 
 export function getPost(
@@ -170,6 +178,8 @@ export function getPost(
       title: meta.title || slug,
       description: meta.description || "",
       date: meta.date || "",
+      author: meta.author || undefined,
+      featured: meta.featured === "true",
     },
     html: renderMarkdown(body),
   };

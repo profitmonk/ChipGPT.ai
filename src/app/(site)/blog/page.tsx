@@ -25,9 +25,11 @@ export default function BlogIndexPage() {
             {posts.map((p) => (
               <li key={p.slug} className="py-7 first:pt-0">
                 <Link href={`/blog/${p.slug}`} className="group block">
-                  {p.date && (
-                    <p className="mono-label mb-2 text-zinc-600">{p.date}</p>
-                  )}
+                  <p className="mono-label mb-2 text-zinc-600">
+                    {p.featured && <span className="text-green-600">Featured · </span>}
+                    {p.date}
+                    {p.author && ` · ${p.author}`}
+                  </p>
                   <h2 className="text-[1.25rem] font-semibold tracking-[-0.02em] text-white transition-colors group-hover:text-green-400">
                     {p.title}
                   </h2>
