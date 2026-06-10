@@ -31,9 +31,7 @@ export const NAV_LINKS: {
   { label: "Outcomes", href: "/outcomes" },
   { label: "Enterprise", href: "/enterprise" },
   { label: "Blog", href: "/blog" },
-  // Static standalone page (served via rewrite) — must be a real navigation,
-  // so the navbar renders external links as a plain <a>.
-  { label: "Live Demo", href: "/coworker", external: true },
+  { label: "Live Demo", href: "/coworker" },
 ];
 
 export const DEMO_HREF = "/demo";
