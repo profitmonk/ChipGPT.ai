@@ -63,7 +63,7 @@ function specStyle(line) {
 
 // ---------- data load ----------
 async function loadBugs() {
-  const bugs = await (await fetch("/coworker/bugs.json")).json();
+  const bugs = await (await fetch("/coworker-app/bugs.json")).json();
   const sel = $("bugSelect");
   sel.innerHTML = "";
   bugs.forEach((b) => {
@@ -102,7 +102,7 @@ function buildLanding(bugs) {
 async function selectBug(bugId) {
   stop();
   state.bugId = bugId;
-  const base = `/coworker/bugs/${bugId}`;
+  const base = `/coworker-app/bugs/${bugId}`;
   // live mode loads trace.live.json; fall back to curated if it doesn't exist.
   const wanted = state.live ? "trace.live.json" : "trace.json";
   let resp = await fetch(`${base}/${wanted}`);
