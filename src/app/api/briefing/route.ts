@@ -64,13 +64,15 @@ export async function POST(req: Request) {
       text,
     });
     if (error) {
+      console.error("[briefing] Resend error:", error); // visible in Vercel logs
       return Response.json(
         { ok: false, error: "Couldn't send right now. Please email connect@chipgpt.ai." },
         { status: 502 },
       );
     }
     return Response.json({ ok: true });
-  } catch {
+  } catch (err) {
+    console.error("[briefing] send threw:", err); // visible in Vercel logs
     return Response.json(
       { ok: false, error: "Couldn't send right now. Please email connect@chipgpt.ai." },
       { status: 502 },
