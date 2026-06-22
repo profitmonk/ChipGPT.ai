@@ -3,106 +3,144 @@
 The public marketing site (Next.js 16 / Vercel). Mostly static; the configured
 piece is the **Request a Briefing** form (`/demo`), which emails leads.
 
+This document mirrors the **actual working configuration** (verified end-to-end:
+a Resend send to `connect@chipgpt.ai` returns `delivered`). It is not a list of
+theoretical best-practice records — it is exactly what is live.
+
 ## Architecture — three services, one domain
-| Service | Role | Touches |
+| Service | Role | Owns these DNS records |
 |---|---|---|
-| **Vercel** | Hosts the site (`chipgpt.ai`) + the form's API route | env vars; apex `A` / `www` CNAME |
-| **Resend** | **Sends** the form's email (from `@chipgpt.ai`) | `send` MX/SPF + `resend._domainkey` DKIM |
-| **Proton** | **Receives** mail at `connect@chipgpt.ai` | apex MX + SPF + Proton DKIM |
+| **Vercel** | Hosts the site (`chipgpt.ai`) | `A @`, `CNAME www`, `TXT _vercel` |
+| **Resend** | **Sends** the form's email (from `@chipgpt.ai`) | `TXT resend._domainkey`, `TXT send`, `MX send` |
+| **Proton** | **Receives** mail at `connect@chipgpt.ai` | `TXT @ protonmail-verification`, `MX @` ×2 |
 
 DNS is at **Namecheap**. Key constraint: Resend's `send` MX requires Namecheap
-**Mail Settings = "Custom MX"** — which means Namecheap's own Email-Forwarding can't
-be used at the same time. So **receiving goes through Proton** (apex MX), and Resend
-and Proton coexist because they're on different hosts (`send` vs `@`).
+**Mail Settings = "Custom MX"** (Namecheap's own Email-Forwarding can't be used at
+the same time). Receiving therefore goes through **Proton** via the apex (`@`) MX.
+Resend and Proton coexist because their MX records are on **different hosts**
+(`send` vs `@`).
 
-## Status
-- ✅ **Vercel** site live; form + `/api/briefing` deployed.
-- ✅ **Resend** domain `chipgpt.ai` verified (DKIM + `send` SPF/MX) — sending works.
-- ⬜ **Proton receiving** — apex MX + SPF + DKIM **still to add**, and the
-  `connect@chipgpt.ai` address must be created in Proton. **Until this is done,
-  `connect@` does not receive** (apex MX is empty → mail bounces).
-
----
-
-## DNS records (final state, at Namecheap → Advanced DNS)
-Legend: 🟢 Vercel · 🟣 Resend (sending) · 🔵 Proton (receiving) · ⭐ unique — copy exact value from the provider.
-
-### HOST RECORDS (top section)
-| Type | Host | Value | |
-|---|---|---|---|
-| A | `@` | `216.150.1.1` | 🟢 don't touch |
-| CNAME | `www` | `cname.vercel-dns.com.` | 🟢 don't touch |
-| TXT | `_vercel` | `vc-domain-verify=chipgpt.ai,5675e80d4e791ed2a759` | 🟢 don't touch |
-| TXT | `resend._domainkey` | `p=MIGfMA0…` | 🟣 ⭐ ✅ |
-| TXT | `send` | `v=spf1 include:amazonses.com ~all` | 🟣 ✅ |
-| TXT | `@` | `protonmail-verification=da01d2e281e56f…` | 🔵 ⭐ ✅ |
-| TXT | `@` | `v=spf1 include:_spf.protonmail.ch ~all` | 🔵 ⬜ add |
-| CNAME | `protonmail._domainkey` | `…domains.proton.ch.` | 🔵 ⭐ ⬜ add |
-| CNAME | `protonmail2._domainkey` | `…domains.proton.ch.` | 🔵 ⭐ ⬜ add |
-| CNAME | `protonmail3._domainkey` | `…domains.proton.ch.` | 🔵 ⭐ ⬜ add |
-| TXT | `_dmarc` | `v=DMARC1; p=none;` | optional, one only |
-
-### MAIL SETTINGS → "Custom MX" (bottom section — MX records live here)
-| Host | Value | Priority | |
-|---|---|---|---|
-| `send` | `feedback-smtp.us-east-1.amazonses.com` | `10` | 🟣 ✅ |
-| `@` | `mail.protonmail.ch` | `10` | 🔵 ⬜ add |
-| `@` | `mailsec.protonmail.ch` | `20` | 🔵 ⬜ add |
-
-**Rules:** only ONE SPF per host (apex SPF = Proton's; Resend's is on `send`); only
-ONE `_dmarc`; never edit the 🟢 Vercel rows; keep Mail Settings on **Custom MX**
-(switching to Email Forwarding deletes the `send` MX and breaks Resend).
+## Status — ✅ all live & verified
+- ✅ **Vercel** — site live; `/demo` form + `/api/briefing` deployed.
+- ✅ **Resend** — domain `chipgpt.ai` verified; sends from `briefings@chipgpt.ai`.
+- ✅ **Proton** — `connect@chipgpt.ai` exists; apex MX live; test send → `delivered`.
+- ✅ **Vercel env** — `RESEND_API_KEY`, `BRIEFING_FROM`, `BRIEFING_TO` set.
+- ℹ️ **Proton SPF/DKIM are intentionally NOT added** — not required to *receive*
+  (the MX alone routes inbound mail). Only add them later if you want to *send*
+  replies *from* `connect@` with good deliverability. See note at the end.
 
 ---
 
-## Steps per service
+## DNS records — exactly what is live (Namecheap → Domain List → chipgpt.ai → Advanced DNS)
+Legend: 🟢 Vercel · 🟣 Resend (sending) · 🔵 Proton (receiving)
 
-### Resend (sending) — ✅ done, for reference
-1. Resend → **Domains → Add Domain** → `chipgpt.ai`.
-2. Add the 3 records it shows → Namecheap: `send` MX (Custom MX), `send` SPF (TXT),
-   `resend._domainkey` DKIM (TXT).
-3. Resend → **Verify** (green).
+### HOST RECORDS (upper table) — 6 records
+| Type | Host | Value | TTL | |
+|---|---|---|---|---|
+| A Record | `@` | `216.150.1.1` | Automatic | 🟢 |
+| CNAME Record | `www` | `cname.vercel-dns.com.` | Automatic | 🟢 |
+| TXT Record | `@` | `protonmail-verification=da01d2e281e56f6b678ec5cac…` | Automatic | 🔵 |
+| TXT Record | `_vercel` | `vc-domain-verify=chipgpt.ai,5675e80d4e791ed2a759` | Automatic | 🟢 |
+| TXT Record | `resend._domainkey` | `p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBg…` | Automatic | 🟣 |
+| TXT Record | `send` | `v=spf1 include:amazonses.com ~all` | Automatic | 🟣 |
 
-### Proton (receiving `connect@`) — ⬜ remaining
-1. Proton → **Settings → Domain names → chipgpt.ai** → it lists the records.
-2. Namecheap **Custom MX**: add apex MX → `mail.protonmail.ch` (10),
-   `mailsec.protonmail.ch` (20). *(Leave the `send` MX as-is — different host, no conflict.)*
-3. Namecheap **Host Records**: add Proton SPF (`@` → `v=spf1 include:_spf.protonmail.ch ~all`)
-   and the 3 Proton DKIM CNAMEs (`protonmail._domainkey`, `protonmail2…`, `protonmail3…`).
-4. Proton → **Verify**, then **create the address `connect@chipgpt.ai`** (mailbox or
-   alias — requires a paid Proton plan for custom domains).
+### MAIL SETTINGS = "Custom MX" (lower table) — 3 MX records
+| Type | Host | Value | Priority | TTL | |
+|---|---|---|---|---|---|
+| MX Record | `send` | `feedback-smtp.us-east-1.amazonses.com.` | `10` | Automatic | 🟣 |
+| MX Record | `@` | `mail.protonmail.ch.` | `10` | Automatic | 🔵 |
+| MX Record | `@` | `mailsec.protonmail.ch.` | `20` | Automatic | 🔵 |
 
-### Vercel (the app + env)
-Set in **Vercel → ChipGPT.ai → Settings → Environment Variables** (Production +
-Preview); for local `next dev` use **`ChipGPT.ai/.env.local`**. `.env*` is gitignored.
+**Rules that keep this working:**
+- MX records live **only** in the lower *Mail Settings* box (mode = **Custom MX**),
+  never in the upper Host Records table.
+- Keep mode on **Custom MX**. Switching to "Email Forwarding" deletes the `send`
+  MX and breaks Resend.
+- The two SPF records are on **different hosts** (`send` = Resend) — fine. There
+  is **no apex SPF**, and that's OK (apex SPF only matters for sending *from* `@`).
 
-| Variable | Value | Notes |
-|---|---|---|
-| `RESEND_API_KEY` | `re_…` | ✅ set |
-| `BRIEFING_FROM` | `ChipGPT Briefings <briefings@chipgpt.ai>` | must be on the verified domain (no mailbox needed to *send*) |
-| `BRIEFING_TO` | `connect@chipgpt.ai` | the Proton inbox (works once Proton receiving is live) |
+---
 
-**After any env change, redeploy** (env applies only to new deployments).
+## Step-by-step to reproduce (in the order it was built)
+
+### A. Vercel — host the site 🟢
+1. Vercel → import `profitmonk/ChipGPT.ai` → **Settings → Domains → Add `chipgpt.ai`**.
+2. Vercel shows: `A @ → 216.150.1.1`, `CNAME www → cname.vercel-dns.com`, `TXT _vercel → vc-domain-verify=…`.
+3. Namecheap → **Advanced DNS → Host Records → ADD NEW RECORD** → add those three.
+4. Back in Vercel, wait for the domain to verify (green).
+
+### B. Resend — enable sending from `@chipgpt.ai` 🟣
+1. Resend → **Domains → Add Domain → `chipgpt.ai`**. It lists three records.
+2. Namecheap **Host Records → ADD NEW RECORD** (×2):
+   - `TXT` host `resend._domainkey` → value `p=MIGf…` (the DKIM key Resend shows — copy exact).
+   - `TXT` host `send` → value `v=spf1 include:amazonses.com ~all`.
+3. Namecheap **MAIL SETTINGS** dropdown → set to **Custom MX**. Then **ADD NEW RECORD**:
+   - `MX` host `send` → value `feedback-smtp.us-east-1.amazonses.com` → priority `10`.
+4. Resend → **Verify** → all three go green.
+
+### C. Proton — enable receiving at `connect@chipgpt.ai` 🔵
+*(Requires a paid Proton plan — custom domains need Mail Plus or higher.)*
+1. Proton → **Settings → Domain names → Add domain → `chipgpt.ai`**.
+2. Proton gives a verification TXT. Namecheap **Host Records → ADD NEW RECORD**:
+   - `TXT` host `@` → value `protonmail-verification=da01d2…` (copy exact).
+3. Proton → **Verify** the domain.
+4. Namecheap **MAIL SETTINGS** (still **Custom MX**) → **ADD NEW RECORD** (×2),
+   alongside the existing `send` MX:
+   - `MX` host `@` → value `mail.protonmail.ch` → priority `10`.
+   - `MX` host `@` → value `mailsec.protonmail.ch` → priority `20`.
+5. In Proton, **create the address `connect@chipgpt.ai`** (mailbox or alias).
+6. Click **SAVE ALL CHANGES** in the Namecheap Mail Settings box.
+   *(SPF/DKIM for Proton are NOT added — see note below. Not needed to receive.)*
+
+### D. Vercel — point the form at the verified domain
+In **Vercel → ChipGPT.ai → Settings → Environment Variables** (Production + Preview);
+for local `next dev`, mirror in **`ChipGPT.ai/.env.local`** (gitignored):
+
+| Variable | Value |
+|---|---|
+| `RESEND_API_KEY` | `re_…` |
+| `BRIEFING_FROM` | `ChipGPT Briefings <briefings@chipgpt.ai>` |
+| `BRIEFING_TO` | `connect@chipgpt.ai` |
+
+**Redeploy after any env change** (env applies only to new deployments).
 
 ---
 
 ## How the form works
-`/demo` form → `POST /api/briefing` → Resend → `BRIEFING_TO`, **Reply-To = the
-visitor** (reply goes to the lead). Honeypot drops bots. Real Resend errors are
-logged to Vercel function logs (`[briefing] …`); the visitor sees a generic
-"please email connect@chipgpt.ai".
+`/demo` form → `POST /api/briefing` → Resend → `BRIEFING_TO`, with **Reply-To = the
+visitor** (so a reply goes straight to the lead). A hidden honeypot field drops
+bots. Real Resend errors are logged to Vercel function logs (`[briefing] …`); the
+visitor only sees a generic "please email connect@chipgpt.ai".
 
 ## Verify / diagnose
-End-to-end: submit `chipgpt.ai/demo` → it should land in the Proton `connect@`
-inbox; Reply goes to the visitor. Diagnose a send directly:
+End-to-end: submit `chipgpt.ai/demo` → it should arrive in the Proton `connect@`
+inbox; Reply goes to the visitor. To probe sending + delivery directly:
 ```bash
-curl -X POST https://api.resend.com/emails -H "Authorization: Bearer $RESEND_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"from":"ChipGPT Briefings <briefings@chipgpt.ai>","to":["connect@chipgpt.ai"],"subject":"test","text":"hi"}'
+# send
+id=$(curl -s -X POST https://api.resend.com/emails \
+  -H "Authorization: Bearer $RESEND_API_KEY" -H "Content-Type: application/json" \
+  -d '{"from":"ChipGPT Briefings <briefings@chipgpt.ai>","to":["connect@chipgpt.ai"],"subject":"test","text":"hi"}' \
+  | python3 -c "import sys,json;print(json.load(sys.stdin)['id'])")
+# delivery status (delivered / bounced)
+curl -s -H "Authorization: Bearer $RESEND_API_KEY" "https://api.resend.com/emails/$id" \
+  | python3 -c "import sys,json;print(json.load(sys.stdin)['last_event'])"
 ```
-- `200 {"id":…}` = Resend sent it. If it doesn't arrive, the gap is **receiving**
-  (Proton apex MX / address) — check `dig MX chipgpt.ai` is non-empty.
-- `403 "domain is not verified"` = a Resend record (`send` MX/SPF/DKIM) is pending.
+- `delivered` = full loop works (current state).
+- `bounced` = receiving side — check `dig MX chipgpt.ai` returns the Proton MX and
+  that `connect@` exists in Proton.
+- `403 "domain is not verified"` at send = a Resend record (`send` MX/SPF or DKIM)
+  is missing/pending.
+- DNS changes propagate in ~10–30 min; query the authoritative NS to see saved
+  state immediately: `dig MX chipgpt.ai @dns1.registrar-servers.com`.
+
+## Note — Proton SPF/DKIM (optional, not currently added)
+Receiving needs only the **MX**, which is why the live setup omits them. Add them
+**only** when you want to *send* replies from `connect@chipgpt.ai` via Proton:
+- SPF: `TXT @` → `v=spf1 include:_spf.protonmail.ch ~all` — ⚠️ only ONE SPF per
+  host; since there's no apex SPF today you're clear (Resend's is on `send`).
+- DKIM: the **3 CNAMEs** Proton's wizard shows (`protonmail._domainkey`,
+  `protonmail2…`, `protonmail3…` → `…domains.proton.ch.`) — unique per domain.
+- (Optional) DMARC: `TXT _dmarc` → `v=DMARC1; p=none;`.
 
 ## Other site notes
 - **`/coworker`** = the live demo, wrapping `public/coworker-app/` (an iframe).
