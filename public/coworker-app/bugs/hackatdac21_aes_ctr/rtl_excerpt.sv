@@ -1,5 +1,7 @@
-// aes_ctr.sv  —  representative excerpt (see bug.json: source_url)
-// AES counter (CTR) mode block — counter register.
+// aes_ctr.sv  -  representative excerpt illustrating the publicly-documented
+// Hack@DAC 2021 AES-CTR bug (CWE-1240). This is our own depiction of the bug
+// pattern, not a copy of upstream source. Bug report: see bug.json source_url.
+// AES counter (CTR) mode block, counter register.
 module aes_ctr_counter (
     input  logic         clk_i,
     input  logic         rst_ni,
