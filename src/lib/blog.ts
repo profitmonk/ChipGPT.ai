@@ -146,19 +146,21 @@ export function getAllPosts(): PostMeta[] {
   return fs
     .readdirSync(BLOG_DIR)
     .filter((f) => f.endsWith(".md"))
-    .map((f) => {
-      const { meta } = parseFrontmatter(
-        fs.readFileSync(path.join(BLOG_DIR, f), "utf8"),
-      );
-      return {
-        slug: f.replace(/\.md$/, ""),
-        title: meta.title || f,
-        description: meta.description || "",
-        date: meta.date || "",
-        author: meta.author || undefined,
-        featured: meta.featured === "true",
-      };
-    })
+    .map((f) => ({
+      f,
+      meta: parseFrontmatter(fs.readFileSync(path.join(BLOG_DIR, f), "utf8")).meta,
+    }))
+    // Only real posts render: a file needs title + date frontmatter. This skips
+    // STYLE.md (the writing brief) and any other non-post markdown in this folder.
+    .filter(({ meta }) => meta.title && meta.date)
+    .map(({ f, meta }) => ({
+      slug: f.replace(/\.md$/, ""),
+      title: meta.title,
+      description: meta.description || "",
+      date: meta.date || "",
+      author: meta.author || undefined,
+      featured: meta.featured === "true",
+    }))
     // Featured posts pin to the top, then newest-first by date.
     .sort((a, b) => {
       if (a.featured !== b.featured) return a.featured ? -1 : 1;
@@ -172,6 +174,8 @@ export function getPost(
   const file = path.join(BLOG_DIR, `${slug}.md`);
   if (!fs.existsSync(file)) return null;
   const { meta, body } = parseFrontmatter(fs.readFileSync(file, "utf8"));
+  // Non-post markdown (e.g. STYLE.md) has no title/date; don't render it as a post.
+  if (!meta.title || !meta.date) return null;
   return {
     meta: {
       slug,
