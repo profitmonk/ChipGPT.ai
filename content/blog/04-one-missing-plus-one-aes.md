@@ -22,6 +22,8 @@ That increment is load-bearing. Remove it and the scheme collapses.
 
 A Hack@DAC system-on-chip shipped an AES block where, in CTR mode, the counter register never incremented ([Hack@DAC 2021](https://github.com/HACK-EVENT/hackatdac21), ground-truth bug #14, CWE-1240). Hack@DAC is a public hardware-security contest whose designs come with a known list of planted bugs, so this one is documented in full. In `aes_ctr.sv`, the next-counter logic simply held its current value. The per-block `+1` was absent on every path.
 
+The RTL shown in our demo is our own representative excerpt illustrating this publicly documented bug, not a copy of the upstream source.
+
 The consequence is total. Every block is now combined with the same keystream. That is a one-time pad reused across the entire message, and reused keystream is the oldest break in cryptography. XOR two ciphertext blocks together and the shared keystream cancels, leaving the XOR of two plaintexts. With any known or guessable plaintext, the keystream falls out and the rest of the message decrypts. The encryption is decorative.
 
 ## Why functional tests miss it
