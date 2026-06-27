@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://chipgpt.ai"),
   title: "ChipGPT — AI Co-Workers for the Semiconductor Lifecycle",
   description: SITE_DESCRIPTION,
   keywords: [
