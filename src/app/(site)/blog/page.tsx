@@ -24,7 +24,8 @@ export default function BlogIndexPage() {
       />
 
       <section>
-        <div className="mx-auto max-w-3xl px-6 py-14 lg:px-10 lg:py-20">
+        <div className="mx-auto max-w-7xl px-6 pb-16 pt-8 lg:px-10 lg:pb-24 lg:pt-10">
+          <div className="max-w-3xl">
           {/* Featured thesis post, visually distinct from the numbered files. */}
           {featured && (
             <Link
@@ -75,6 +76,7 @@ export default function BlogIndexPage() {
           </ol>
 
           <BlogCTA />
+          </div>
         </div>
       </section>
     </>
