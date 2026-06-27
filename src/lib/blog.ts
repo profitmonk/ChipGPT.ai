@@ -184,6 +184,13 @@ export function getAllPosts(): PostMeta[] {
     });
 }
 
+// The numbered "Silicon Bug Files" series (posts with a bug_number), in order.
+export function getSeriesPosts(): PostMeta[] {
+  return getAllPosts()
+    .filter((p) => p.bugNumber)
+    .sort((a, b) => (a.bugNumber! < b.bugNumber! ? -1 : 1));
+}
+
 export function getPost(
   slug: string,
 ): { meta: PostMeta; html: string } | null {

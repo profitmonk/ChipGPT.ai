@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/site-shell";
 import { BugTLDR } from "@/components/blog/bug-tldr";
 import { HeroDiagram } from "@/components/blog/hero-diagram";
-import { getAllPosts, getPost } from "@/lib/blog";
+import { SeriesNav } from "@/components/blog/series-nav";
+import { BlogCTA } from "@/components/blog/blog-cta";
+import { getAllPosts, getPost, getSeriesPosts } from "@/lib/blog";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -23,6 +25,11 @@ export default async function BlogPostPage({ params }: Params) {
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) notFound();
+
+  const series = getSeriesPosts();
+  const idx = series.findIndex((p) => p.slug === slug);
+  const prev = idx > 0 ? series[idx - 1] : null;
+  const next = idx >= 0 && idx < series.length - 1 ? series[idx + 1] : null;
 
   return (
     <>
@@ -49,6 +56,8 @@ export default async function BlogPostPage({ params }: Params) {
             className="blogpost"
             dangerouslySetInnerHTML={{ __html: post.html }}
           />
+          {idx >= 0 && <SeriesNav prev={prev} next={next} />}
+          <BlogCTA />
           <div className="mt-14 border-t border-white/[0.07] pt-8">
             <Link
               href="/blog"
