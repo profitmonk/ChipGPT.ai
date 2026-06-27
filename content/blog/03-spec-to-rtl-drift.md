@@ -5,6 +5,12 @@ date: "2026-06-23"
 tldr_bug: "The address-validity check spans the wrong bit range ([63:39] instead of [63:38]), letting illegal addresses through."
 tldr_miss: "Nothing links the spec PDF to the RTL, and the tests inherit the same misreading as the code."
 tldr_fix: "Extract the rule from the spec, compare it to the actual RTL bit range, and leave a spec-to-test traceability link."
+bug_number: "03"
+codename: "Spec-to-RTL drift"
+stakes: "One wrong bit quietly becomes a security hole."
+severity: "critical · ~70% of respins"
+evidence: "[63:38] vs [63:39]  // one bit off"
+teaser: "The RTL drifts one bit from the spec and every test still passes."
 ---
 
 Ask why a chip needed a respin and the honest answer is usually mundane. The RTL did not do what the spec said. Not a clever corner case, just a place where the design drifted from the document and nobody noticed. A respin is a re-manufacturing of the chip after a bug is found, which means new photomasks and another fab run, and it costs months. Published industry analyses put roughly 70% of respins in the "design error" bucket, and a large share of those are spec misinterpretation. It is the single most common reason silicon comes back.

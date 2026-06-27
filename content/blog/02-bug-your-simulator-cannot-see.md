@@ -5,6 +5,12 @@ date: "2026-06-16"
 tldr_bug: "A signal crossing between two unrelated clocks has no synchronizer, so the receiving flip-flop can go metastable."
 tldr_miss: "Zero-delay RTL simulation cannot represent metastability, so a missing synchronizer simulates identically to a correct one."
 tldr_fix: "Analyze the clock structure and flag every cross-domain signal that lacks a synchronizer or handshake."
+bug_number: "02"
+codename: "The bug your simulator can't see"
+stakes: "It passes every simulation, then fails in the lab."
+severity: "critical · escapes to silicon"
+evidence: "clk A → clk B  // no synchronizer"
+teaser: "A clock-domain bug that is invisible to simulation by construction."
 ---
 
 You can run a hardware design through a million simulation cycles, reach full coverage, watch every assertion pass, and still ship a chip that looks correct and then fails on a lab bench. For one family of bugs this is not a testing gap you can close by writing more tests. The simulator cannot represent the failure at all.

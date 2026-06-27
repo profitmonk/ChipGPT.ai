@@ -5,6 +5,12 @@ date: "2026-07-21"
 tldr_bug: "The SCL low period adds the bus fall time twice, holding the clock low one fall-time too long every cycle."
 tldr_miss: "Functional tests check that bytes transfer, not the exact duration of the low phase."
 tldr_fix: "Measure the real SCL low period against the spec's timing formula in a directed test."
+bug_number: "07"
+codename: "Counted twice"
+stakes: "A clock held low one fall-time too long, every cycle."
+severity: "medium · timing"
+evidence: "t_low + t_f + t_f  // doubled"
+teaser: "An I2C controller that adds the bus fall time twice."
 ---
 
 Not every bug breaks a function. Some break a number. The design still does what it is supposed to do, just slightly wrong in a way no functional check is watching, and the error rides out to silicon inside a timing calculation that looks reasonable on the page. An I2C controller that counts one timing parameter twice is exactly this kind of bug.

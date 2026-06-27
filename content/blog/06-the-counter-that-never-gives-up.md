@@ -5,6 +5,12 @@ date: "2026-07-14"
 tldr_bug: "An 8-bit retry counter is compared against a larger limit it can never reach, so it retries forever."
 tldr_miss: "Normal tests use small limits, so the counter never wraps and the corner is never exercised."
 tldr_fix: "Check that the counter can represent every limit it is compared against, and prove the give-up condition is reachable."
+bug_number: "06"
+codename: "The counter that never gives up"
+stakes: "An 8-bit counter that can never reach its limit."
+severity: "high · infinite retry"
+evidence: "counter ≤ 255 < limit 1000"
+teaser: "An 8-bit retry counter compared to a 16-bit limit it can never reach."
 ---
 
 A counter that counts wrong is easy to spot. A counter that counts fine but is one bit too narrow for the number it is compared against is not, because it works for every value you are likely to test and fails only at the edge. That edge is where a real Ethernet design got stuck in a loop it could never leave.
