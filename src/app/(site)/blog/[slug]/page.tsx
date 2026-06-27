@@ -40,7 +40,8 @@ export default async function BlogPostPage({ params }: Params) {
       />
 
       <section>
-        <div className="mx-auto max-w-3xl px-6 py-14 lg:px-10 lg:py-20">
+        <div className="mx-auto max-w-7xl px-6 pb-16 pt-8 lg:px-10 lg:pb-24 lg:pt-10">
+          <div className="max-w-3xl">
           {post.meta.tldrBug && post.meta.tldrMiss && post.meta.tldrFix && (
             <BugTLDR
               bug={post.meta.tldrBug}
@@ -65,6 +66,7 @@ export default async function BlogPostPage({ params }: Params) {
             >
               <span aria-hidden>←</span> All posts
             </Link>
+          </div>
           </div>
         </div>
       </section>
