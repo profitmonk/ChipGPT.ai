@@ -48,10 +48,10 @@ export default async function Image() {
 
   // Embed the real wordmark (black artwork) on a light plate so it reads on dark.
   const logo = fs.readFileSync(
-    path.join(process.cwd(), "public", "brand", "chipgpt-wordmark.png"),
+    path.join(process.cwd(), "public", "brand", "chipgpt-wordmark-white.png"),
   );
   const logoUri = `data:image/png;base64,${logo.toString("base64")}`;
-  const logoW = 560;
+  const logoW = 600;
   const logoH = Math.round((logoW * 174) / 712);
 
   return new ImageResponse(
@@ -75,18 +75,9 @@ export default async function Image() {
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          <div
-            style={{
-              display: "flex",
-              background: WHITE,
-              borderRadius: 18,
-              padding: "36px 48px",
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoUri} width={logoW} height={logoH} alt="ChipGPT" />
-          </div>
-          <div style={{ display: "flex", marginTop: 32, fontSize: 34, color: MUTED, maxWidth: 1000 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={logoUri} width={logoW} height={logoH} alt="ChipGPT" />
+          <div style={{ display: "flex", marginTop: 36, fontSize: 34, color: MUTED, maxWidth: 1000 }}>
             {tagline}
           </div>
         </div>
