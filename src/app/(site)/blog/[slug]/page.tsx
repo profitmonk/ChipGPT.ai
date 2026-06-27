@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/site-shell";
 import { BugTLDR } from "@/components/blog/bug-tldr";
+import { HeroDiagram } from "@/components/blog/hero-diagram";
 import { getAllPosts, getPost } from "@/lib/blog";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -40,6 +41,7 @@ export default async function BlogPostPage({ params }: Params) {
               fix={post.meta.tldrFix}
             />
           )}
+          <HeroDiagram slug={slug} />
           {post.meta.author && (
             <p className="mono-label mb-8 text-zinc-500">By {post.meta.author}</p>
           )}
