@@ -14,6 +14,14 @@ export type PostMeta = {
   tldrBug?: string;
   tldrMiss?: string;
   tldrFix?: string;
+  // Series / OG-card fields (flat frontmatter). Present on the numbered bug files.
+  bugNumber?: string;
+  codename?: string;
+  ogMono?: string;
+  stakes?: string;
+  severity?: string;
+  evidence?: string;
+  teaser?: string;
 };
 
 function parseFrontmatter(raw: string): {
@@ -164,6 +172,10 @@ export function getAllPosts(): PostMeta[] {
       date: meta.date || "",
       author: meta.author || undefined,
       featured: meta.featured === "true",
+      bugNumber: meta.bug_number || undefined,
+      codename: meta.codename || undefined,
+      severity: meta.severity || undefined,
+      teaser: meta.teaser || undefined,
     }))
     // Featured posts pin to the top, then newest-first by date.
     .sort((a, b) => {
@@ -191,6 +203,13 @@ export function getPost(
       tldrBug: meta.tldr_bug || undefined,
       tldrMiss: meta.tldr_miss || undefined,
       tldrFix: meta.tldr_fix || undefined,
+      bugNumber: meta.bug_number || undefined,
+      codename: meta.codename || undefined,
+      ogMono: meta.og_mono || undefined,
+      stakes: meta.stakes || undefined,
+      severity: meta.severity || undefined,
+      evidence: meta.evidence || undefined,
+      teaser: meta.teaser || undefined,
     },
     html: renderMarkdown(body),
   };

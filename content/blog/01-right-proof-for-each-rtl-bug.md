@@ -5,6 +5,12 @@ date: "2026-06-09"
 tldr_bug: "No single verification method catches every class of hardware bug."
 tldr_miss: "A flow that leans on one technique is blind to the bug classes the other two were built for."
 tldr_fix: "Match the proof to the bug: formal for bit-level logic, simulation for protocol timing, structural for clock-domain issues."
+bug_number: "01"
+codename: "Right proof for each bug"
+stakes: "One technique alone misses whole classes of bugs."
+severity: "method · the field guide"
+evidence: "formal · simulation · structural"
+teaser: "Why one verification method can't catch every bug class."
 ---
 
 First-silicon success has fallen to around 14%, the lowest in two decades of Wilson Research and Siemens EDA tracking. First-silicon success means the very first manufactured chip works well enough to ship, and when it fails the team needs a respin, a re-manufacturing run with new photomasks that costs months. Most of those respins are not exotic. They trace back to bugs that were sitting in the RTL the whole time, in classes the industry has known about for years. RTL is the human-written Verilog or SystemVerilog code that describes the chip's logic. What separates the teams that catch these bugs from the teams that tape them out is rarely more verification effort. It is applying the right kind of verification to each bug.
