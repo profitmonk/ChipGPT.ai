@@ -59,11 +59,23 @@ export default async function Image({
     `${number} ${codename} ${stakes} ${severity} ${evidence} ` +
     "0123456789 →·+/✓✗[]<>'\"";
 
+  // Resilient: a font that fails to load degrades to null rather than 500-ing the
+  // image. As long as one face loads, the card still renders.
   const [sans, sansBold, mono] = await Promise.all([
-    font(["Geist:wght@500", "Inter:wght@500"], text),
-    font(["Geist:wght@700", "Inter:wght@700"], text),
-    font(["Geist+Mono:wght@500", "JetBrains+Mono:wght@500"], text),
+    font(["Geist:wght@500", "Inter:wght@500"], text).catch(() => null),
+    font(["Geist:wght@700", "Inter:wght@700"], text).catch(() => null),
+    font(["Geist+Mono:wght@500", "JetBrains+Mono:wght@500"], text).catch(() => null),
   ]);
+
+  const fonts: {
+    name: string;
+    data: ArrayBuffer;
+    style: "normal";
+    weight: 500 | 700;
+  }[] = [];
+  if (sans) fonts.push({ name: "sans", data: sans, style: "normal", weight: 500 });
+  if (sansBold) fonts.push({ name: "sans", data: sansBold, style: "normal", weight: 700 });
+  if (mono) fonts.push({ name: "mono", data: mono, style: "normal", weight: 500 });
 
   // Codename: optionally render one fragment in mono red (e.g. "+1").
   let cnBefore = codename;
@@ -236,11 +248,7 @@ export default async function Image({
     {
       width: 1200,
       height: 630,
-      fonts: [
-        { name: "sans", data: sans, style: "normal", weight: 500 },
-        { name: "sans", data: sansBold, style: "normal", weight: 700 },
-        { name: "mono", data: mono, style: "normal", weight: 500 },
-      ],
+      ...(fonts.length ? { fonts } : {}),
     },
   );
 }
