@@ -2,6 +2,9 @@
 title: "A Bus That Can Hang Forever: The Three-Way Deadlock"
 description: "Three masters wait on each other in a circle and a shared bus stops forever. Random tests almost never hit it. Here is why deadlock is so hard to catch, and how a bounded proof exposes it."
 date: "2026-07-07"
+tldr_bug: "Three bus masters wait on each other in a circle and the arbiter never rotates, so the bus hangs forever."
+tldr_miss: "The hang needs an exact simultaneous ordering of all three masters that random tests almost never hit."
+tldr_fix: "Prove forward progress with bounded model checking plus a watchdog simulation that exhibits the starvation."
 ---
 
 Most bugs produce a wrong answer. This one produces no answer at all. A shared bus stops moving and never recovers, and the chip around it quietly wedges. The worst part is that the design can pass simulation for weeks before anyone sees it, because hitting the failure requires an exact sequence of events that random testing almost never produces.

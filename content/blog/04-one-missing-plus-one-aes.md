@@ -2,6 +2,9 @@
 title: "One Missing +1: How an AES Counter Bug Breaks Your Crypto"
 description: "A single missing increment turned a hardware AES engine into a fixed-keystream cipher anyone could break, while every functional test still passed. Here is why, and the one property that catches it."
 date: "2026-06-30"
+tldr_bug: "In counter mode the counter never increments, so every block is encrypted with the same keystream."
+tldr_miss: "Block-level tests check that the cipher encrypts correctly, never that consecutive blocks use different counters."
+tldr_fix: "Assert the invariant the standard requires: after each block the counter must change."
 ---
 
 Some hardware bugs degrade performance. Some corrupt a corner case. And some quietly turn strong encryption into no encryption at all, while every functional test reports "data encrypted successfully." A missing `+1` in an AES counter is exactly that kind of bug. AES is the Advanced Encryption Standard, the block cipher that protects most encrypted data in the world, and this bug shipped in a hardware implementation of it.
