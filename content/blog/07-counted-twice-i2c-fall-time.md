@@ -2,6 +2,9 @@
 title: "Counted Twice: How One Extra Fall-Time Breaks I2C Timing"
 description: "An I2C controller that adds the bus fall time twice holds its clock low one fall-time too long every cycle. The bus still works, the tests still pass, and the only proof is a directed test that measures against the spec."
 date: "2026-07-21"
+tldr_bug: "The SCL low period adds the bus fall time twice, holding the clock low one fall-time too long every cycle."
+tldr_miss: "Functional tests check that bytes transfer, not the exact duration of the low phase."
+tldr_fix: "Measure the real SCL low period against the spec's timing formula in a directed test."
 ---
 
 Not every bug breaks a function. Some break a number. The design still does what it is supposed to do, just slightly wrong in a way no functional check is watching, and the error rides out to silicon inside a timing calculation that looks reasonable on the page. An I2C controller that counts one timing parameter twice is exactly this kind of bug.

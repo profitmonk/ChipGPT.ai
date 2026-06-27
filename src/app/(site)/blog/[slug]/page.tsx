@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/layout/site-shell";
+import { BugTLDR } from "@/components/blog/bug-tldr";
 import { getAllPosts, getPost } from "@/lib/blog";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -32,6 +33,13 @@ export default async function BlogPostPage({ params }: Params) {
 
       <section>
         <div className="mx-auto max-w-3xl px-6 py-14 lg:px-10 lg:py-20">
+          {post.meta.tldrBug && post.meta.tldrMiss && post.meta.tldrFix && (
+            <BugTLDR
+              bug={post.meta.tldrBug}
+              miss={post.meta.tldrMiss}
+              fix={post.meta.tldrFix}
+            />
+          )}
           {post.meta.author && (
             <p className="mono-label mb-8 text-zinc-500">By {post.meta.author}</p>
           )}

@@ -10,6 +10,10 @@ export type PostMeta = {
   date: string;
   author?: string;
   featured?: boolean;
+  // Optional skim layer (flat frontmatter fields). Present on the bug-class posts.
+  tldrBug?: string;
+  tldrMiss?: string;
+  tldrFix?: string;
 };
 
 function parseFrontmatter(raw: string): {
@@ -184,6 +188,9 @@ export function getPost(
       date: meta.date || "",
       author: meta.author || undefined,
       featured: meta.featured === "true",
+      tldrBug: meta.tldr_bug || undefined,
+      tldrMiss: meta.tldr_miss || undefined,
+      tldrFix: meta.tldr_fix || undefined,
     },
     html: renderMarkdown(body),
   };
