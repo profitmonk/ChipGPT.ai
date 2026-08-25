@@ -20,9 +20,6 @@ export function ManifestoHero() {
       />
 
       <div className="relative mx-auto w-full max-w-5xl px-6 py-28 lg:px-10">
-        <p className="mono-label mb-8 text-green-600">
-          The foundation for AI-designed silicon
-        </p>
         <h1 className="max-w-[16ch] text-balance font-serif text-[2.6rem] font-medium leading-[1.04] tracking-[-0.02em] text-white sm:text-[3.4rem] lg:text-[4.25rem]">
           AI is built on silicon. The world can&rsquo;t design enough of it.
         </h1>
