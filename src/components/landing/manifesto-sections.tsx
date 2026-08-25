@@ -2,12 +2,17 @@ import Link from "next/link";
 
 function Band({ id, children }: { id?: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="border-b border-green-500/20">
+    <section id={id}>
       <div className="mx-auto max-w-5xl px-6 py-16 lg:px-10 lg:py-20">
         {children}
       </div>
     </section>
   );
+}
+
+/** Half-width centered green divider placed between homepage sections. */
+export function SectionDivider() {
+  return <div className="mx-auto h-px w-1/2 bg-green-500/35" aria-hidden />;
 }
 
 function Statement({ children }: { children: React.ReactNode }) {

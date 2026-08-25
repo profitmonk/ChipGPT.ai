@@ -20,7 +20,7 @@ const LAYERS = [
 
 export function StackSection() {
   return (
-    <section className="border-b border-green-500/20">
+    <section>
       <div className="mx-auto max-w-5xl px-6 py-16 lg:px-10 lg:py-20">
         <h2 className="max-w-[20ch] text-balance font-serif text-[2.15rem] font-medium leading-[1.1] tracking-[-0.015em] text-white sm:text-[2.75rem] lg:text-[3.25rem]">
           A full-stack foundation for AI-designed silicon.
