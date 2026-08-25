@@ -2,8 +2,8 @@ import Link from "next/link";
 
 function Band({ id, children }: { id?: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="border-b border-white/[0.06]">
-      <div className="mx-auto max-w-5xl px-6 py-24 lg:px-10 lg:py-32">
+    <section id={id} className="border-b border-green-500/20">
+      <div className="mx-auto max-w-5xl px-6 py-16 lg:px-10 lg:py-20">
         {children}
       </div>
     </section>

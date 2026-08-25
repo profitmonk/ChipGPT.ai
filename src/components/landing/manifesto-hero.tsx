@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export function ManifestoHero() {
   return (
-    <section className="relative flex min-h-[86svh] items-center border-b border-white/[0.06] pt-14">
+    <section className="relative flex min-h-[86svh] items-center border-b border-green-500/20 pt-14">
       <div
         className="pointer-events-none absolute inset-0 grid-circuit opacity-30"
         aria-hidden
