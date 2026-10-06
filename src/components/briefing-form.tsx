@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
-const inputCls =
+export const inputCls =
   "w-full rounded-md border border-white/[0.12] bg-[#0c0c0c] px-3 py-2.5 text-[14px] " +
   "text-zinc-200 placeholder:text-zinc-600 outline-none transition-colors " +
   "focus:border-green-600/70 focus:ring-1 focus:ring-green-600/40";
-const labelCls = "mb-1.5 block text-[12px] font-medium text-zinc-400";
+export const labelCls = "mb-1.5 block text-[12px] font-medium text-zinc-400";
 
 export function BriefingForm() {
   const [status, setStatus] = useState<Status>("idle");
@@ -78,6 +78,14 @@ export function BriefingForm() {
             <label htmlFor="stage" className={labelCls}>Program stage</label>
             <input id="stage" name="stage" className={inputCls} placeholder="e.g. pre-tapeout, in DV" />
           </div>
+        </div>
+        <div>
+          <label htmlFor="interest" className={labelCls}>Interested in</label>
+          <select id="interest" name="interest" defaultValue="coworkers" className={inputCls}>
+            <option value="coworkers">AI co-workers for my engineering team</option>
+            <option value="rle">Engineering RLE — evaluating or training AI agents</option>
+            <option value="other">Something else</option>
+          </select>
         </div>
         <div>
           <label htmlFor="message" className={labelCls}>What&apos;s your primary use case?</label>

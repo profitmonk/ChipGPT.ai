@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const LAYERS = [
   {
     h: "Data & memory",
@@ -15,6 +17,7 @@ const LAYERS = [
   {
     h: "Reliability",
     p: "Debug tooling, CI/CD, and benchmarks that keep AI-designed silicon trustworthy as it scales.",
+    link: { href: "/rle", label: "Engineering RLE: how we evaluate agents" },
   },
 ];
 
@@ -51,6 +54,14 @@ export function StackSection() {
               <p className="mt-2 max-w-[54ch] text-[1.02rem] leading-[1.55] text-zinc-500">
                 {l.p}
               </p>
+              {"link" in l && l.link && (
+                <Link
+                  href={l.link.href}
+                  className="mt-3 inline-flex items-center gap-1.5 font-mono text-[12px] uppercase tracking-wider text-green-600 transition-colors hover:text-green-500"
+                >
+                  {l.link.label} <span aria-hidden>&rarr;</span>
+                </Link>
+              )}
             </div>
           ))}
         </div>

@@ -13,6 +13,25 @@ const FROM = process.env.BRIEFING_FROM || "ChipGPT Briefings <onboarding@resend.
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
+// Interest topics (general form select + /rle form). Unknown values fall back.
+const INTERESTS: Record<string, string> = {
+  coworkers: "AI co-workers",
+  rle: "Engineering RLE",
+  other: "Other",
+};
+
+// Categorical /rle fields — only these whitelisted values are accepted.
+const RLE_CHOICES: Record<string, string[]> = {
+  objective: ["evaluation", "post-training", "regression", "vendor-selection", "eda-integration", "other"],
+  deployment: ["hosted-endpoint", "customer-vpc", "onprem-airgap-discovery", "undecided"],
+  timeline: ["0-3-months", "3-6-months", "6-plus-months", "exploring"],
+};
+
+const clip = (v: unknown, max = 2000) =>
+  typeof v === "string" ? v.trim().slice(0, max) : "";
+const choice = (field: string, v: unknown) =>
+  typeof v === "string" && RLE_CHOICES[field].includes(v) ? v : "";
+
 export async function POST(req: Request) {
   let body: Record<string, string>;
   try {
@@ -22,6 +41,7 @@ export async function POST(req: Request) {
   }
 
   const { name, email, company, stage, message, website } = body ?? {};
+  const interest = INTERESTS[body?.interest] ? body.interest : "";
 
   // Honeypot: real users never fill this hidden field; bots do. Drop silently.
   if (website) return Response.json({ ok: true });
@@ -42,17 +62,35 @@ export async function POST(req: Request) {
     );
   }
 
-  const text = [
-    "New briefing request from chipgpt.ai",
-    "",
-    `Name:    ${name}`,
-    `Email:   ${email}`,
-    `Company: ${company?.trim() || "—"}`,
-    `Stage:   ${stage?.trim() || "—"}`,
-    "",
-    "Message:",
-    message?.trim() || "—",
-  ].join("\n");
+  const isRle = interest === "rle";
+  const text = isRle
+    ? [
+        "New Engineering RLE briefing request from chipgpt.ai/rle",
+        "",
+        `Name:       ${name}`,
+        `Email:      ${email}`,
+        `Company:    ${clip(company, 200) || "—"}`,
+        `Role:       ${clip(body.role, 200) || "—"}`,
+        `Evaluating: ${clip(body.model, 300) || "—"}`,
+        `Objective:  ${choice("objective", body.objective) || "—"}`,
+        `Deployment: ${choice("deployment", body.deployment) || "—"}`,
+        `Timeline:   ${choice("timeline", body.timeline) || "—"}`,
+        "",
+        "Capability priorities:",
+        clip(body.priorities) || "—",
+      ].join("\n")
+    : [
+        "New briefing request from chipgpt.ai",
+        "",
+        `Name:     ${name}`,
+        `Email:    ${email}`,
+        `Company:  ${company?.trim() || "—"}`,
+        `Stage:    ${stage?.trim() || "—"}`,
+        `Interest: ${interest ? INTERESTS[interest] : "—"}`,
+        "",
+        "Message:",
+        message?.trim() || "—",
+      ].join("\n");
 
   try {
     const resend = new Resend(key);
@@ -60,7 +98,7 @@ export async function POST(req: Request) {
       from: FROM,
       to: [TO],
       replyTo: email, // reply goes straight to the lead
-      subject: `Briefing request — ${name}${company?.trim() ? `, ${company}` : ""}`,
+      subject: `${isRle ? "RLE briefing request" : "Briefing request"} — ${name}${company?.trim() ? `, ${company}` : ""}`,
       text,
     });
     if (error) {

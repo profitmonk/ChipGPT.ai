@@ -44,10 +44,10 @@ export function Navbar() {
           </span>
         </Link>
 
-        <div className="hidden items-center gap-6 lg:flex">
+        <div className="hidden items-center gap-4 lg:flex xl:gap-6">
           {NAV_LINKS.map((link) => {
             const cls = cn(
-              "text-[13px] transition-colors",
+              "whitespace-nowrap text-[13px] transition-colors",
               isActive(link.href) ? "text-white" : "text-zinc-500 hover:text-white"
             );
             return link.external ? (

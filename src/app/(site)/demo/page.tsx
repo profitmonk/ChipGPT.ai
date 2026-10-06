@@ -55,6 +55,19 @@ export default function DemoPage() {
                   </Button>
                 </div>
               </div>
+
+              <div className="panel p-8">
+                <p className="mono-label text-zinc-600">Evaluating AI agents?</p>
+                <p className="mt-4 text-[14px] leading-relaxed text-zinc-500">
+                  Engineering RLE measures coding agents on executable RTL, DV, firmware,
+                  and coverage tasks with protected grading.
+                </p>
+                <div className="mt-6">
+                  <Button variant="outline" size="lg" asChild>
+                    <Link href="/rle">See Engineering RLE</Link>
+                  </Button>
+                </div>
+              </div>
             </div>
 
             <BriefingForm />
