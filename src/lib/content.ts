@@ -30,6 +30,7 @@ export const NAV_LINKS: {
   { label: "Architecture", href: "/architecture" },
   { label: "Outcomes", href: "/outcomes" },
   { label: "Enterprise", href: "/enterprise" },
+  { label: "Engineering RLE", href: "/rle" },
   { label: "Blog", href: "/blog" },
   { label: "Live Demo", href: "/coworker" },
 ];

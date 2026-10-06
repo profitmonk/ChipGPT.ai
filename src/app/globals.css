@@ -1,34 +1,58 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens — light, editorial palette (paper + ink, one accent).
+ * Change the look here; components use the semantic names below
+ * (bg-paper, text-ink, border-rule, text-accent, …), never raw hex.
+ */
 :root {
-  --background: #030303;
-  --foreground: #f4f4f5;
-  --muted: #71717a;
-  --graphite: #0c0c0c;
-  --graphite-panel: #0f0f0f;
-  --graphite-elevated: #141414;
-  --accent: #22c55e;
-  --accent-dim: #166534;
-  --border: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.12);
-  /* Semantic colors for blog diagrams / TL;DR (no prior token existed). */
-  --danger: #f0716a;
-  --pass: #86c166;
+  --paper: #fbfaf7; /* page */
+  --paper-2: #f3f1eb; /* alternate section band */
+  --surface: #ffffff; /* cards, panels, inputs */
+  --ink: #1c1b18; /* headings, primary text */
+  --ink-2: #47443d; /* body text */
+  --ink-3: #6b675e; /* captions, labels (≥4.5:1 on paper and paper-2) */
+  --rule: rgba(28, 27, 24, 0.1);
+  --rule-strong: rgba(28, 27, 24, 0.2);
+  --accent: #23408e; /* ink blue — the single accent */
+  --accent-strong: #1a3172;
+  --accent-soft: #eef1f8;
+  /* Semantic colors for blog diagrams / TL;DR. */
+  --danger: #b42318;
+  --pass: #3f7d20;
   --slate: #5c6675;
+  --muted: #6b675e;
+
+  /* Legacy aliases (kept so older references keep working). */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --border: var(--rule);
+  --border-strong: var(--rule-strong);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-graphite: var(--graphite);
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
   --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
   --color-danger: var(--danger);
   --color-pass: var(--pass);
   --color-slate: var(--slate);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
+  --color-muted: var(--muted);
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  /* Display serif for h1/h2 and statements; body serif for reading text. */
+  --font-serif: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-newsreader), Georgia, "Times New Roman", serif;
 }
 
 html {
@@ -36,68 +60,95 @@ html {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: 17px;
   -webkit-font-smoothing: antialiased;
-  letter-spacing: -0.011em;
+}
+
+@layer base {
+  h1,
+  h2 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  /* Interface chrome stays in the sans face. */
+  nav,
+  button,
+  input,
+  select,
+  textarea,
+  label,
+  summary {
+    font-family: var(--font-sans);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 }
 
 ::selection {
-  background: rgba(34, 197, 94, 0.18);
-  color: #fff;
+  background: rgba(35, 64, 142, 0.16);
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 .grid-circuit {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    linear-gradient(rgba(28, 27, 24, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28, 27, 24, 0.035) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 .panel {
-  border: 1px solid var(--border);
-  background: var(--graphite-panel);
+  border: 1px solid var(--rule);
+  background: var(--surface);
 }
 
 .panel-inset {
-  border: 1px solid var(--border);
-  background: var(--graphite);
+  border: 1px solid var(--rule);
+  background: var(--paper-2);
 }
 
 .mono-label {
-  font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 10px;
-  letter-spacing: 0.06em;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
 .flow-line {
-  background: linear-gradient(
-    to bottom,
-    rgba(34, 197, 94, 0.4),
-    rgba(255, 255, 255, 0.08)
-  );
+  background: linear-gradient(to bottom, rgba(35, 64, 142, 0.45), var(--rule));
 }
 
 /* Blog post body (rendered from markdown via dangerouslySetInnerHTML) */
 .blogpost {
-  color: #d4d4d8;
-  font-size: 16px;
-  line-height: 1.75;
+  color: var(--ink-2);
+  font-size: 19px;
+  line-height: 1.7;
 }
 .blogpost > :first-child {
   margin-top: 0;
 }
 .blogpost h2 {
-  color: #fff;
-  font-size: 1.4rem;
-  font-weight: 600;
+  color: var(--ink);
+  font-size: 1.75rem;
+  font-weight: 400;
   letter-spacing: -0.02em;
   margin: 2.4rem 0 0.8rem;
 }
 .blogpost h3 {
-  color: #fff;
+  color: var(--ink);
   font-size: 1.1rem;
   font-weight: 600;
   margin: 1.8rem 0 0.6rem;
@@ -106,24 +157,24 @@ body {
   margin: 0 0 1.1rem;
 }
 .blogpost a {
-  color: #4ade80;
+  color: var(--accent);
   text-decoration: none;
-  border-bottom: 1px solid rgba(74, 222, 128, 0.3);
+  border-bottom: 1px solid rgba(35, 64, 142, 0.3);
 }
 .blogpost a:hover {
-  color: #86efac;
+  color: var(--accent-strong);
 }
 .blogpost strong {
-  color: #fff;
+  color: var(--ink);
   font-weight: 600;
 }
 .blogpost code {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 0.88em;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(28, 27, 24, 0.05);
   padding: 0.1em 0.4em;
   border-radius: 4px;
-  color: #4ade80;
+  color: var(--accent);
 }
 .blogpost ul,
 .blogpost ol {
@@ -134,15 +185,15 @@ body {
   margin: 0.35rem 0;
 }
 .blogpost blockquote {
-  border-left: 2px solid var(--accent-dim);
+  border-left: 2px solid var(--accent);
   padding: 0.3rem 0 0.3rem 1.1rem;
   margin: 1.4rem 0;
-  color: #a1a1aa;
+  color: var(--ink-3);
   font-style: italic;
 }
 .blogpost hr {
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--rule);
   margin: 2.2rem 0;
 }
 .blogpost table {
@@ -153,13 +204,13 @@ body {
 }
 .blogpost th,
 .blogpost td {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--rule-strong);
   padding: 8px 12px;
   text-align: left;
   vertical-align: top;
 }
 .blogpost th {
-  color: #fff;
+  color: var(--ink);
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--paper-2);
 }

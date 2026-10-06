@@ -3,10 +3,10 @@ import { PAYBACK_OUTCOMES } from "@/lib/content";
 
 export function PaybackSection({ embedded = false }: { embedded?: boolean }) {
   const grid = (
-    <div className="grid gap-px border border-white/[0.07] bg-white/[0.07] sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-px border border-rule bg-rule sm:grid-cols-2 lg:grid-cols-3">
       {PAYBACK_OUTCOMES.map((outcome) => (
-        <div key={outcome} className="flex min-h-full items-center bg-[#080808] px-7 py-8">
-          <p className="text-[14px] font-medium leading-snug text-zinc-300">
+        <div key={outcome} className="flex min-h-full items-center bg-surface px-7 py-8">
+          <p className="text-[14px] font-medium leading-snug text-ink">
             {outcome}
           </p>
         </div>
@@ -16,7 +16,7 @@ export function PaybackSection({ embedded = false }: { embedded?: boolean }) {
 
   if (embedded) {
     return (
-      <section className="border-b border-white/[0.06] bg-[#060606]">
+      <section className="border-b border-rule bg-paper-2">
         <div className="mx-auto max-w-7xl px-6 py-20 lg:px-10 lg:py-28">
           <SectionHeader
             eyebrow="Outcomes"
@@ -30,7 +30,7 @@ export function PaybackSection({ embedded = false }: { embedded?: boolean }) {
   }
 
   return (
-    <section className="border-b border-white/[0.06]">
+    <section className="border-b border-rule">
       <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
         <SectionHeader
           eyebrow="Outcomes"

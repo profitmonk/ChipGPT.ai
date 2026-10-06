@@ -51,7 +51,7 @@ export default async function BlogPostPage({ params }: Params) {
           )}
           <HeroDiagram slug={slug} />
           {post.meta.author && (
-            <p className="mono-label mb-8 text-zinc-500">By {post.meta.author}</p>
+            <p className="mono-label mb-8 text-ink-3">By {post.meta.author}</p>
           )}
           <article
             className="blogpost"
@@ -59,10 +59,10 @@ export default async function BlogPostPage({ params }: Params) {
           />
           {idx >= 0 && <SeriesNav prev={prev} next={next} />}
           <BlogCTA />
-          <div className="mt-14 border-t border-white/[0.07] pt-8">
+          <div className="mt-14 border-t border-rule pt-8">
             <Link
               href="/blog"
-              className="font-mono text-[11px] uppercase tracking-wider text-green-600 transition-colors hover:text-green-500"
+              className="font-mono text-[11px] uppercase tracking-wider text-accent transition-colors hover:text-accent"
             >
               <span aria-hidden>←</span> All posts
             </Link>

@@ -4,7 +4,7 @@ const { applications, intelligence, dataSources } = OPERATING_LAYER_DIAGRAM;
 
 function LayerLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mono-label mb-4 text-zinc-600">{children}</p>
+    <p className="mono-label mb-4 text-ink-3">{children}</p>
   );
 }
 
@@ -16,10 +16,10 @@ function LayerCell({
   variant?: "default" | "agent" | "intelligence" | "source";
 }) {
   const styles = {
-    default: "border-white/[0.08] bg-[#0a0a0a] text-zinc-400",
-    agent: "border-white/[0.1] bg-[#0a0a0a] text-zinc-300",
-    intelligence: "border-green-900/25 bg-[#0c100c] text-green-700/90",
-    source: "border-white/[0.08] bg-[#080808] text-zinc-500",
+    default: "border-rule bg-surface text-ink-2",
+    agent: "border-rule-strong bg-surface text-ink",
+    intelligence: "border-accent/25 bg-accent-soft text-accent",
+    source: "border-rule bg-surface text-ink-3",
   };
 
   return (
@@ -55,7 +55,7 @@ function ConnectorBand({
   const leafY = direction === "up-ingest" ? 4 : height - 4;
 
   return (
-    <div className="relative border-y border-white/[0.05] bg-[#060606]" aria-hidden>
+    <div className="relative border-y border-rule bg-paper-2" aria-hidden>
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className="h-14 w-full"
@@ -90,8 +90,8 @@ function ConnectorBand({
               y2={hubY}
               stroke={
                 direction === "up-ingest"
-                  ? "rgba(34,197,94,0.2)"
-                  : "rgba(34,197,94,0.25)"
+                  ? "rgba(35,64,142,0.3)"
+                  : "rgba(35,64,142,0.35)"
               }
               strokeWidth="1"
             />
@@ -103,12 +103,12 @@ function ConnectorBand({
             <polygon
               key={pct}
               points={`${width * pct},${hubY - 6} ${width * pct - 4},${hubY + 2} ${width * pct + 4},${hubY + 2}`}
-              fill="rgba(34,197,94,0.35)"
+              fill="rgba(35,64,142,0.45)"
             />
           ))}
       </svg>
       <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-center">
-        <span className="bg-[#060606] px-3 font-mono text-[9px] uppercase tracking-widest text-zinc-700">
+        <span className="bg-paper-2 px-3 font-mono text-[9px] uppercase tracking-widest text-ink-3">
           {direction === "up-ingest" ? "Data ingest ↑" : "Agent output ↑"}
         </span>
       </div>
@@ -118,12 +118,12 @@ function ConnectorBand({
 
 export function OperatingLayerDiagram() {
   return (
-    <div className="w-full border border-white/[0.08] bg-[#070707]">
+    <div className="w-full border border-rule bg-paper-2">
       {/* ── Top: Engineering Applications ── */}
-      <div className="border-b border-white/[0.06] px-5 py-6 sm:px-8 sm:py-8">
+      <div className="border-b border-rule px-5 py-6 sm:px-8 sm:py-8">
         <LayerLabel>Engineering Applications</LayerLabel>
         <div className="overflow-x-auto">
-          <div className="grid min-w-[640px] grid-cols-6 gap-px bg-white/[0.06]">
+          <div className="grid min-w-[640px] grid-cols-6 gap-px bg-rule">
             {applications.map((agent) => (
               <LayerCell key={agent} label={agent} variant="agent" />
             ))}
@@ -138,12 +138,12 @@ export function OperatingLayerDiagram() {
       />
 
       {/* ── Middle: Intelligence Layer ── */}
-      <div className="border-y border-green-900/35 bg-[#0a120a] px-5 py-7 sm:px-8 sm:py-9">
-        <p className="text-center font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-green-600">
+      <div className="border-y border-accent/25 bg-accent-soft px-5 py-7 sm:px-8 sm:py-9">
+        <p className="text-center font-mono text-[11px] font-medium uppercase tracking-[0.22em] text-accent">
           ChipGPT Intelligence Layer
         </p>
         <div className="mt-6 overflow-x-auto">
-          <div className="grid min-w-[640px] grid-cols-5 gap-px bg-green-950/20">
+          <div className="grid min-w-[640px] grid-cols-5 gap-px bg-accent-soft">
             {intelligence.map((component) => (
               <LayerCell
                 key={component}
@@ -153,7 +153,7 @@ export function OperatingLayerDiagram() {
             ))}
           </div>
         </div>
-        <p className="mt-5 text-center font-mono text-[10px] text-zinc-600">
+        <p className="mt-5 text-center font-mono text-[10px] text-ink-3">
           Governed reasoning · Permission gates · Audit logging
         </p>
       </div>
@@ -168,7 +168,7 @@ export function OperatingLayerDiagram() {
       <div className="px-5 py-6 sm:px-8 sm:py-8">
         <LayerLabel>Engineering Data Sources</LayerLabel>
         <div className="overflow-x-auto">
-          <div className="grid min-w-[720px] grid-cols-7 gap-px bg-white/[0.06]">
+          <div className="grid min-w-[720px] grid-cols-7 gap-px bg-rule">
             {dataSources.map((source) => (
               <LayerCell key={source} label={source} variant="source" />
             ))}
@@ -177,16 +177,16 @@ export function OperatingLayerDiagram() {
       </div>
 
       {/* Side annotations */}
-      <div className="grid grid-cols-2 gap-px border-t border-white/[0.06] bg-white/[0.06] text-center">
-        <div className="bg-[#080808] px-4 py-3">
-          <p className="mono-label text-zinc-700">Input</p>
-          <p className="mt-1 text-[11px] text-zinc-500">
+      <div className="grid grid-cols-2 gap-px border-t border-rule bg-rule text-center">
+        <div className="bg-surface px-4 py-3">
+          <p className="mono-label text-ink-3">Input</p>
+          <p className="mt-1 text-[11px] text-ink-3">
             Engineering data flows upward into the intelligence layer
           </p>
         </div>
-        <div className="bg-[#080808] px-4 py-3">
-          <p className="mono-label text-zinc-700">Output</p>
-          <p className="mt-1 text-[11px] text-zinc-500">
+        <div className="bg-surface px-4 py-3">
+          <p className="mono-label text-ink-3">Output</p>
+          <p className="mt-1 text-[11px] text-ink-3">
             Structured insights flow into specialized agents
           </p>
         </div>

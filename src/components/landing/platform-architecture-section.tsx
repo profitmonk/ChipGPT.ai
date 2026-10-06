@@ -25,7 +25,7 @@ export function PlatformArchitectureSection({
             {ARCHITECTURE_INPUTS.map((input) => (
               <div
                 key={input}
-                className="panel-inset px-4 py-3 text-center text-[13px] text-zinc-400"
+                className="panel-inset px-4 py-3 text-center text-[13px] text-ink-2"
               >
                 {input}
               </div>
@@ -36,19 +36,19 @@ export function PlatformArchitectureSection({
         <FlowConnector />
 
         <ArchitectureLayer label="ChipGPT Intelligence Layer">
-          <div className="panel border-green-900/30 bg-[#0a120a] px-6 py-5">
+          <div className="panel border-accent/25 bg-accent-soft px-6 py-5">
             <div className="grid gap-4 sm:grid-cols-3">
               {["Knowledge Graph", "Domain Engines", "Agent Orchestration"].map(
                 (item) => (
                   <div key={item} className="text-center">
-                    <p className="text-[13px] font-medium text-green-600">
+                    <p className="text-[13px] font-medium text-accent">
                       {item}
                     </p>
                   </div>
                 )
               )}
             </div>
-            <p className="mt-4 text-center font-mono text-[10px] text-zinc-600">
+            <p className="mt-4 text-center font-mono text-[10px] text-ink-3">
               Secure ingestion · Permission gates · Audit logging
             </p>
           </div>
@@ -68,7 +68,7 @@ export function PlatformArchitectureSection({
             ].map((agent) => (
               <div
                 key={agent}
-                className="panel-inset px-3 py-3 text-center text-[12px] text-zinc-400"
+                className="panel-inset px-3 py-3 text-center text-[12px] text-ink-2"
               >
                 {agent}
               </div>
@@ -83,7 +83,7 @@ export function PlatformArchitectureSection({
             {ARCHITECTURE_OUTPUTS.map((output) => (
               <div
                 key={output}
-                className="panel-inset px-4 py-3 text-center text-[13px] text-zinc-400"
+                className="panel-inset px-4 py-3 text-center text-[13px] text-ink-2"
               >
                 {output}
               </div>
@@ -96,7 +96,7 @@ export function PlatformArchitectureSection({
 
   if (embedded) {
     return (
-      <section className="border-b border-white/[0.06]">
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeader
             eyebrow="System"
@@ -110,7 +110,7 @@ export function PlatformArchitectureSection({
   }
 
   return (
-    <section className="border-b border-white/[0.06]">
+    <section className="border-b border-rule">
       <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
         {content}
       </div>
@@ -127,7 +127,7 @@ function ArchitectureLayer({
 }) {
   return (
     <div>
-      <p className="mono-label mb-4 text-zinc-600">{label}</p>
+      <p className="mono-label mb-4 text-ink-3">{label}</p>
       {children}
     </div>
   );

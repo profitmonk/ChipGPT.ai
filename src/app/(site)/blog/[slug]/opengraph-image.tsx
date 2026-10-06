@@ -7,11 +7,11 @@ export const alt = "ChipGPT — Silicon Bug Files";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const BG = "#0b0d10";
-const ACCENT = "#22c55e"; // the repo's real accent (green)
-const DANGER = "#f0716a";
-const MUTED = "#9aa4b2";
-const WHITE = "#f4f4f5";
+const BG = "#ffffff"; // white so the wordmark's white plate blends in
+const ACCENT = "#23408e"; // the site accent (ink blue)
+const DANGER = "#b42318";
+const MUTED = "#6b675e";
+const WHITE = "#1c1b18";
 
 // Load a Google Font as TTF for satori. Node's default fetch UA makes the CSS2
 // endpoint return a truetype src, which satori can use (woff2 would not work).
@@ -148,8 +148,8 @@ export default async function Image({
               alignItems: "center",
               padding: "10px 22px",
               borderRadius: 999,
-              background: "rgba(240,113,106,0.14)",
-              border: "1px solid rgba(240,113,106,0.45)",
+              background: "rgba(180,35,24,0.08)",
+              border: "1px solid rgba(180,35,24,0.35)",
               color: DANGER,
               fontSize: 20,
             }}
@@ -201,7 +201,7 @@ export default async function Image({
             <div
               style={{ display: "flex", marginTop: 30, fontSize: 24, fontFamily: "mono" }}
             >
-              <span style={{ display: "flex", color: "#cbd5e1" }}>{evMain}</span>
+              <span style={{ display: "flex", color: "#47443d" }}>{evMain}</span>
               {evComment ? (
                 <span style={{ display: "flex", color: MUTED }}>{evComment}</span>
               ) : null}
@@ -227,7 +227,7 @@ export default async function Image({
                 background: ACCENT,
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#04140a",
+                color: "#ffffff",
                 fontSize: 19,
                 fontWeight: 700,
                 fontFamily: "mono",

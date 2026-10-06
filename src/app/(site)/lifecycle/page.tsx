@@ -19,7 +19,7 @@ export default function LifecyclePage() {
         description="The entire semiconductor engineering process is powered by ChipGPT. A unified intelligence layer spans specification through production—specialized agents engage at each critical stage."
       />
 
-      <section className="border-b border-white/[0.06] bg-[#060606]">
+      <section className="border-b border-rule bg-paper-2">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeader
             eyebrow="Lifecycle Flow"
@@ -31,7 +31,7 @@ export default function LifecyclePage() {
         </div>
       </section>
 
-      <section className="border-b border-white/[0.06]">
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeader
             eyebrow="Agent Ownership"
@@ -51,42 +51,42 @@ export default function LifecyclePage() {
             description="Deep coverage of each engineering phase and ChipGPT's role within it."
             className="mb-8"
           />
-          <div className="space-y-px border border-white/[0.07] bg-white/[0.07]">
+          <div className="space-y-px border border-rule bg-rule">
             {LIFECYCLE_STAGE_DETAILS.map((detail, index) => (
               <div
                 key={detail.stage}
-                className="grid gap-6 bg-[#080808] p-6 lg:grid-cols-[200px_1fr]"
+                className="grid gap-6 bg-surface p-6 lg:grid-cols-[200px_1fr]"
               >
                 <div>
-                  <span className="font-mono text-[10px] text-zinc-700">
+                  <span className="font-mono text-[10px] text-ink-3">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <h3 className="mt-1 text-[15px] font-semibold text-white">
+                  <h3 className="mt-1 text-[15px] font-semibold text-ink">
                     {detail.stage}
                   </h3>
                 </div>
                 <div className="space-y-4">
-                  <p className="text-[13px] leading-relaxed text-zinc-500">
+                  <p className="text-[13px] leading-relaxed text-ink-3">
                     {detail.summary}
                   </p>
                   <div>
-                    <p className="mono-label mb-2 text-zinc-600">
+                    <p className="mono-label mb-2 text-ink-3">
                       Engineering Focus
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {detail.engineeringFocus.map((f) => (
                         <span
                           key={f}
-                          className="border border-white/[0.08] bg-[#0a0a0a] px-2 py-1 text-[11px] text-zinc-400"
+                          className="border border-rule bg-surface px-2 py-1 text-[11px] text-ink-2"
                         >
                           {f}
                         </span>
                       ))}
                     </div>
                   </div>
-                  <div className="border-l border-green-900/40 pl-4">
-                    <p className="mono-label mb-1 text-green-700">ChipGPT</p>
-                    <p className="text-[13px] leading-relaxed text-zinc-500">
+                  <div className="border-l border-accent/25 pl-4">
+                    <p className="mono-label mb-1 text-accent">ChipGPT</p>
+                    <p className="text-[13px] leading-relaxed text-ink-3">
                       {detail.chipgptRole}
                     </p>
                   </div>

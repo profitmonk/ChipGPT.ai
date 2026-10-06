@@ -1,18 +1,18 @@
 // Per-post hero diagrams: one purpose-built, hand-authored inline SVG per bug post,
 // rendered right under the TL;DR. Shared visual grammar:
 //   correct/expected = pass green, the bug = danger red, neutral structure = slate.
-// Monospace for values. Dark, flat, ~1.9:1, screenshot-friendly, a11y via role=img
+// Monospace for values. Light, flat, ~1.9:1, screenshot-friendly, a11y via role=img
 // + <title>/<desc>. Keyed by slug so a new post opts in by adding an entry here.
 import type { ReactNode } from "react";
 
-const PASS = "#86C166";
-const DANGER = "#F0716A";
-const SLATE = "#5C6675";
-const ACCENT = "#22c55e";
-const MUTED = "#9AA4B2";
-const TEXT = "#d4d4d8";
-const WHITE = "#f4f4f5";
-const HAIR = "rgba(255,255,255,0.10)";
+const PASS = "#3F7D20";
+const DANGER = "#B42318";
+const SLATE = "#7A8494";
+const ACCENT = "#23408E";
+const MUTED = "#6B675E";
+const TEXT = "#47443D";
+const WHITE = "#1C1B18"; // primary ink (name kept from the dark theme)
+const HAIR = "rgba(28,27,24,0.14)";
 
 const MONO = "font-mono";
 const SANS = "font-sans";
@@ -33,7 +33,7 @@ function Frame({
         role="img"
         aria-label={`${label}. ${desc}`}
         className="block h-auto w-full"
-        style={{ background: "#0b0d10", fontFamily: "var(--font-geist-sans)" }}
+        style={{ background: "#ffffff", fontFamily: "var(--font-geist-sans)" }}
       >
         <title>{label}</title>
         <desc>{desc}</desc>
@@ -219,7 +219,7 @@ function DeadlockDiagram() {
       ))}
       {nodes.map((n) => (
         <g key={n.id}>
-          <circle cx={n.x} cy={n.y} r={42} fill="#0b0d10" stroke={SLATE} strokeWidth={2} />
+          <circle cx={n.x} cy={n.y} r={42} fill="#ffffff" stroke={SLATE} strokeWidth={2} />
           <text x={n.x} y={n.y - 2} textAnchor="middle" className={MONO} fontSize={18} fill={WHITE}>
             {n.id}
           </text>

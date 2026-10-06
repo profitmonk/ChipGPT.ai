@@ -30,30 +30,30 @@ function LifecycleDiagramInner() {
 
   return (
     <div className="relative">
-      <div className="border border-green-900/35 bg-[#0a120a]">
+      <div className="border border-accent/25 bg-accent-soft">
         <div className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="mono-label text-green-600">
+            <p className="mono-label text-accent">
               ChipGPT Intelligence Layer
             </p>
-            <p className="mt-1 text-[13px] font-medium text-zinc-300">
+            <p className="mt-1 text-[13px] font-medium text-ink">
               Knowledge Graph · Domain Engines · Agent Orchestration
             </p>
           </div>
-          <p className="font-mono text-[10px] text-zinc-600">
+          <p className="font-mono text-[10px] text-ink-3">
             Full lifecycle span · Governed · Audit-logged
           </p>
         </div>
         <div
-          className="grid border-t border-green-900/25"
+          className="grid border-t border-accent/25"
           style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
         >
           {LIFECYCLE_STAGES.map((stage) => (
             <div
               key={stage}
-              className="flex justify-center border-r border-green-900/15 last:border-r-0"
+              className="flex justify-center border-r border-accent/25 last:border-r-0"
             >
-              <span className="h-2 w-px bg-green-800/40" aria-hidden />
+              <span className="h-2 w-px bg-accent/60" aria-hidden />
             </div>
           ))}
         </div>
@@ -71,7 +71,7 @@ function LifecycleDiagramInner() {
             y1="4"
             x2={cols * 100 - 50}
             y2="4"
-            stroke="rgba(34,197,94,0.2)"
+            stroke="rgba(35,64,142,0.3)"
             strokeWidth="1"
           />
           {LIFECYCLE_AGENTS.map((agent) => {
@@ -85,7 +85,7 @@ function LifecycleDiagramInner() {
                   y1="4"
                   x2={agentX}
                   y2="28"
-                  stroke="rgba(255,255,255,0.12)"
+                  stroke="rgba(28,27,24,0.2)"
                   strokeWidth="1"
                 />
                 {xs.map((sx, j) => (
@@ -95,7 +95,7 @@ function LifecycleDiagramInner() {
                     y1="52"
                     x2={sx}
                     y2="88"
-                    stroke="rgba(34,197,94,0.25)"
+                    stroke="rgba(35,64,142,0.35)"
                     strokeWidth="1"
                   />
                 ))}
@@ -107,7 +107,7 @@ function LifecycleDiagramInner() {
             y1="88"
             x2={cols * 100 - 50}
             y2="88"
-            stroke="rgba(255,255,255,0.08)"
+            stroke="rgba(28,27,24,0.14)"
             strokeWidth="1"
           />
         </svg>
@@ -125,7 +125,7 @@ function LifecycleDiagramInner() {
                 className="absolute top-0 -translate-x-1/2"
                 style={{ left: `${leftPct}%` }}
               >
-                <span className="whitespace-nowrap border border-white/[0.1] bg-[#0f0f0f] px-2 py-1 font-mono text-[10px] text-green-700">
+                <span className="whitespace-nowrap border border-rule-strong bg-surface px-2 py-1 font-mono text-[10px] text-accent">
                   {agent.label}
                 </span>
               </div>
@@ -147,7 +147,7 @@ function LifecycleDiagramInner() {
             <div key={stage} className="relative flex flex-col items-center px-0.5">
               {index < STAGE_COUNT - 1 && (
                 <span
-                  className="absolute right-0 top-[22px] z-10 translate-x-1/2 font-mono text-[9px] text-zinc-700"
+                  className="absolute right-0 top-[22px] z-10 translate-x-1/2 font-mono text-[9px] text-ink-3"
                   aria-hidden
                 >
                   →
@@ -155,17 +155,17 @@ function LifecycleDiagramInner() {
               )}
 
               <div
-                className={`relative z-20 w-full border bg-[#0a0a0a] px-1 py-2.5 text-center sm:py-3 ${
-                  hasAgent ? "border-green-900/40" : "border-white/[0.1]"
+                className={`relative z-20 w-full border bg-surface px-1 py-2.5 text-center sm:py-3 ${
+                  hasAgent ? "border-accent/25" : "border-rule-strong"
                 }`}
               >
-                <span className="font-mono text-[9px] text-zinc-700">
+                <span className="font-mono text-[9px] text-ink-3">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <p className="mt-1 hidden text-[10px] font-medium leading-tight text-zinc-300 sm:block lg:text-[11px]">
+                <p className="mt-1 hidden text-[10px] font-medium leading-tight text-ink sm:block lg:text-[11px]">
                   {stage}
                 </p>
-                <p className="mt-1 text-[10px] font-medium leading-tight text-zinc-300 sm:hidden">
+                <p className="mt-1 text-[10px] font-medium leading-tight text-ink sm:hidden">
                   {STAGE_SHORT[stage] ?? stage}
                 </p>
               </div>

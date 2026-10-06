@@ -9,11 +9,11 @@ export function BlogCTA() {
       className="panel mt-14 rounded-md p-7"
       style={{ borderLeft: "2px solid var(--accent)" }}
     >
-      <p className="mono-label text-zinc-500">See it live</p>
-      <h3 className="mt-3 text-[1.15rem] font-semibold tracking-[-0.01em] text-white">
+      <p className="mono-label text-ink-3">See it live</p>
+      <h3 className="mt-3 text-[1.15rem] font-semibold tracking-[-0.01em] text-ink">
         Watch the co-worker catch a bug like this
       </h3>
-      <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-zinc-400">
+      <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-ink-2">
         ChipGPT reads the spec and the RTL, finds the bug, and proves it on a real
         open-source core. Request a briefing to see it on your own flow.
       </p>

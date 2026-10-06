@@ -24,7 +24,7 @@ export function BugTLDR({ bug, miss, fix }: Props) {
       style={{ borderLeft: "2px solid var(--accent)" }}
     >
       <div className="px-6 py-6 sm:px-7">
-        <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.14em] text-zinc-500">
+        <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-3">
           In brief
         </p>
         <dl className="grid gap-5">
@@ -44,7 +44,7 @@ export function BugTLDR({ bug, miss, fix }: Props) {
                 />
                 {r.label}
               </dt>
-              <dd className="text-[15px] leading-[1.6] text-zinc-200">
+              <dd className="text-[15px] leading-[1.6] text-ink">
                 {values[i]}
               </dd>
             </div>

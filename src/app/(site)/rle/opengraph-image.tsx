@@ -2,10 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 
-// Site-wide social card (homepage + any page without its own opengraph-image).
-// Blog posts override this with their Silicon Bug Files cards.
+// Social card for /rle — same branded pattern as the site-wide card.
 export const runtime = "nodejs";
-export const alt = "ChipGPT — AI co-workers for the semiconductor lifecycle";
+export const alt = "ChipGPT Engineering RLE — executable evaluation for silicon-engineering agents";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -35,8 +34,10 @@ async function font(specs: string[], text: string): Promise<ArrayBuffer> {
 }
 
 export default async function Image() {
-  const tagline = "AI co-workers for the semiconductor lifecycle";
-  const text = `CHIPGPT.AI ${tagline} chipgpt.ai See the co-worker, live →`;
+  const kicker = "ENGINEERING RLE";
+  const headline = "Know whether an AI agent can engineer silicon — not merely write Verilog.";
+  const footer = "Executable RTL · DV · firmware · coverage tasks";
+  const text = `${kicker} ${headline} ${footer} chipgpt.ai/rle`;
 
   const [sans, sansBold] = await Promise.all([
     font(["Geist:wght@500", "Inter:wght@500"], text).catch(() => null),
@@ -46,12 +47,11 @@ export default async function Image() {
   if (sans) fonts.push({ name: "sans", data: sans, style: "normal", weight: 500 });
   if (sansBold) fonts.push({ name: "sans", data: sansBold, style: "normal", weight: 700 });
 
-  // Embed the real wordmark (black artwork) on the light card.
   const logo = fs.readFileSync(
     path.join(process.cwd(), "public", "brand", "chipgpt-wordmark.png"),
   );
   const logoUri = `data:image/png;base64,${logo.toString("base64")}`;
-  const logoW = 600;
+  const logoW = 300;
   const logoH = Math.round((logoW * 174) / 712);
 
   return new ImageResponse(
@@ -68,27 +68,20 @@ export default async function Image() {
           fontFamily: "sans",
         }}
       >
-        <div
-          style={{ display: "flex", color: ACCENT, fontSize: 24, fontWeight: 700, letterSpacing: 4 }}
-        >
-          CHIPGPT.AI
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <img src={logoUri} width={logoW} height={logoH} alt="ChipGPT" />
+          <div style={{ display: "flex", color: ACCENT, fontSize: 24, fontWeight: 700, letterSpacing: 4 }}>
+            {kicker}
+          </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={logoUri} width={logoW} height={logoH} alt="ChipGPT" />
-          <div style={{ display: "flex", marginTop: 36, fontSize: 34, color: MUTED, maxWidth: 1000 }}>
-            {tagline}
-          </div>
+        <div style={{ display: "flex", fontSize: 60, fontWeight: 700, color: WHITE, lineHeight: 1.12, maxWidth: 1040 }}>
+          {headline}
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", color: WHITE, fontSize: 24, fontWeight: 700 }}>
-            chipgpt.ai
-          </div>
-          <div style={{ display: "flex", color: ACCENT, fontSize: 22 }}>
-            See the co-worker, live →
-          </div>
+          <div style={{ display: "flex", color: MUTED, fontSize: 26 }}>{footer}</div>
+          <div style={{ display: "flex", color: WHITE, fontSize: 24, fontWeight: 700 }}>chipgpt.ai/rle</div>
         </div>
       </div>
     ),

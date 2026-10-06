@@ -5,11 +5,11 @@ export type FlowPipelineNode = {
 };
 
 const variantStyles: Record<NonNullable<FlowPipelineNode["variant"]>, string> = {
-  source: "border-white/[0.1] bg-[#080808] text-zinc-400",
-  core: "border-white/[0.12] bg-[#0a0a0a] text-zinc-300",
-  intelligence: "border-green-900/35 bg-[#0a120a] text-green-700/90",
-  orchestration: "border-green-900/25 bg-[#0c100c] text-zinc-300",
-  output: "border-white/[0.1] bg-[#0a0a0a] text-zinc-400",
+  source: "border-rule-strong bg-surface text-ink-2",
+  core: "border-rule-strong bg-surface text-ink",
+  intelligence: "border-accent/25 bg-accent-soft text-accent",
+  orchestration: "border-accent/25 bg-accent-soft text-ink",
+  output: "border-rule-strong bg-surface text-ink-2",
 };
 
 export function HorizontalFlowPipeline({
@@ -38,7 +38,7 @@ export function HorizontalFlowPipeline({
                     {node.items.map((item) => (
                       <li
                         key={item}
-                        className="text-center font-mono text-[9px] leading-snug text-zinc-600"
+                        className="text-center font-mono text-[9px] leading-snug text-ink-3"
                       >
                         {item}
                       </li>
@@ -51,7 +51,7 @@ export function HorizontalFlowPipeline({
                   className="flex w-6 shrink-0 items-center justify-center sm:w-8"
                   aria-hidden
                 >
-                  <span className="font-mono text-[10px] text-green-800/60">→</span>
+                  <span className="font-mono text-[10px] text-accent">→</span>
                 </div>
               )}
             </div>
@@ -59,8 +59,8 @@ export function HorizontalFlowPipeline({
         </div>
       </div>
       {caption && (
-        <div className="border-t border-white/[0.06] bg-[#080808] px-5 py-2.5">
-          <p className="font-mono text-[10px] text-zinc-600">{caption}</p>
+        <div className="border-t border-rule bg-surface px-5 py-2.5">
+          <p className="font-mono text-[10px] text-ink-3">{caption}</p>
         </div>
       )}
     </div>

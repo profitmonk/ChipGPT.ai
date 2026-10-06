@@ -28,7 +28,7 @@ export default function PlatformPage() {
         description="ChipGPT is not application software. It is infrastructure—a governed intelligence layer that connects engineering data, orchestrates specialized agents, and compounds institutional knowledge across every tapeout program."
       />
 
-      <section className="border-b border-white/[0.06] bg-[#060606]">
+      <section className="border-b border-rule bg-paper-2">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeader
             eyebrow="Operating Layer"
@@ -43,7 +43,7 @@ export default function PlatformPage() {
         </div>
       </section>
 
-      <section className="border-b border-white/[0.06]">
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeader
             eyebrow="System Topology"
@@ -57,7 +57,7 @@ export default function PlatformPage() {
 
       <DataOwnershipStatement />
 
-      <section className="border-b border-white/[0.06] bg-[#060606]">
+      <section className="border-b border-rule bg-paper-2">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeader
             eyebrow="Operations Console"
@@ -69,7 +69,7 @@ export default function PlatformPage() {
         </div>
       </section>
 
-      <section className="border-b border-white/[0.06]">
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeader
             eyebrow="Outputs"
@@ -87,16 +87,16 @@ export default function PlatformPage() {
 
       <section>
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
-          <div className="grid gap-px border border-white/[0.07] bg-white/[0.07] lg:grid-cols-2">
-            <div className="bg-[#080808] p-7">
-              <p className="mono-label text-green-600">Positioning</p>
-              <p className="mt-4 text-[14px] leading-relaxed text-zinc-400">
+          <div className="grid gap-px border border-rule bg-rule lg:grid-cols-2">
+            <div className="bg-surface p-7">
+              <p className="mono-label text-accent">Positioning</p>
+              <p className="mt-4 text-[14px] leading-relaxed text-ink-2">
                 {COMPETITIVE_POSITIONING}
               </p>
             </div>
-            <div className="bg-[#080808] p-7">
-              <p className="mono-label text-green-600">{PLATFORM_MOAT.title}</p>
-              <p className="mt-4 text-[14px] leading-relaxed text-zinc-400">
+            <div className="bg-surface p-7">
+              <p className="mono-label text-accent">{PLATFORM_MOAT.title}</p>
+              <p className="mt-4 text-[14px] leading-relaxed text-ink-2">
                 {PLATFORM_MOAT.description}
               </p>
             </div>
