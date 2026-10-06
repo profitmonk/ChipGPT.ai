@@ -30,16 +30,16 @@ export function Navbar() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 border-b transition-colors duration-200",
         scrolled || pathname !== "/"
-          ? "border-white/[0.08] bg-[#030303]/95 backdrop-blur-md"
+          ? "border-rule bg-paper/90 backdrop-blur-md"
           : "border-transparent bg-transparent"
       )}
     >
       <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6 lg:px-10">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-7 w-7 items-center justify-center border border-green-600/40 bg-green-950/50 text-[10px] font-semibold tracking-wider text-green-400">
+          <span className="flex h-7 w-7 items-center justify-center border border-accent/50 bg-accent-soft text-[10px] font-semibold tracking-wider text-accent">
             CG
           </span>
-          <span className="text-sm font-semibold tracking-tight text-white">
+          <span className="text-sm font-semibold tracking-tight text-ink">
             ChipGPT
           </span>
         </Link>
@@ -48,7 +48,7 @@ export function Navbar() {
           {NAV_LINKS.map((link) => {
             const cls = cn(
               "whitespace-nowrap text-[13px] transition-colors",
-              isActive(link.href) ? "text-white" : "text-zinc-500 hover:text-white"
+              isActive(link.href) ? "text-ink" : "text-ink-3 hover:text-ink"
             );
             return link.external ? (
               <a key={link.href} href={link.href} className={cls}>
@@ -70,7 +70,7 @@ export function Navbar() {
 
         <button
           type="button"
-          className="text-zinc-400 lg:hidden"
+          className="text-ink-2 lg:hidden"
           onClick={() => setMobileOpen((o) => !o)}
           aria-label="Toggle menu"
         >
@@ -79,12 +79,12 @@ export function Navbar() {
       </nav>
 
       {mobileOpen && (
-        <div className="border-t border-white/[0.08] bg-[#030303] px-6 py-5 lg:hidden">
+        <div className="border-t border-rule bg-paper px-6 py-5 lg:hidden">
           <div className="flex flex-col gap-4">
             {NAV_LINKS.map((link) => {
               const cls = cn(
                 "text-sm",
-                isActive(link.href) ? "text-white" : "text-zinc-400"
+                isActive(link.href) ? "text-ink" : "text-ink-2"
               );
               return link.external ? (
                 <a key={link.href} href={link.href} onClick={closeMobile} className={cls}>

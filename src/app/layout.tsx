@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Newsreader } from "next/font/google";
+import { Fraunces, Geist, Geist_Mono, Newsreader } from "next/font/google";
 import { SITE_DESCRIPTION } from "@/lib/content";
 import "./globals.css";
 
@@ -13,7 +13,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Editorial serif for the homepage manifesto statements.
+// Display serif for headlines and statements.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz", "SOFT"],
+});
+
+// Reading serif for body text.
 const newsreader = Newsreader({
   variable: "--font-newsreader",
   subsets: ["latin"],
@@ -51,9 +59,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} scroll-smooth`}
+      className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} ${fraunces.variable} scroll-smooth`}
     >
-      <body className="min-h-screen bg-[#030303] font-sans text-white antialiased">
+      <body className="min-h-screen bg-paper text-ink antialiased">
         {children}
       </body>
     </html>

@@ -24,7 +24,7 @@ export default function DemoPage() {
           <div className="grid gap-12 lg:grid-cols-2">
             <div className="flex flex-col gap-6">
               <div className="panel p-8">
-                <p className="mono-label text-zinc-600">Briefing Includes</p>
+                <p className="mono-label text-ink-3">Briefing Includes</p>
                 <ul className="mt-5 space-y-3">
                   {[
                     "Platform architecture walkthrough",
@@ -32,8 +32,8 @@ export default function DemoPage() {
                     "Deployment and security discussion",
                     "Integration assessment with your engineering systems",
                   ].map((item) => (
-                    <li key={item} className="flex gap-3 text-[13px] text-zinc-400">
-                      <span className="font-mono text-[10px] text-green-700">→</span>
+                    <li key={item} className="flex gap-3 text-[13px] text-ink-2">
+                      <span className="font-mono text-[10px] text-accent">→</span>
                       {item}
                     </li>
                   ))}
@@ -41,8 +41,8 @@ export default function DemoPage() {
               </div>
 
               <div className="panel p-8">
-                <p className="mono-label text-zinc-600">Prefer to look first?</p>
-                <p className="mt-4 text-[14px] leading-relaxed text-zinc-500">
+                <p className="mono-label text-ink-3">Prefer to look first?</p>
+                <p className="mt-4 text-[14px] leading-relaxed text-ink-3">
                   See the RTL/DV co-worker find real bugs in production open-source
                   chips — no signup required.
                 </p>
@@ -57,8 +57,8 @@ export default function DemoPage() {
               </div>
 
               <div className="panel p-8">
-                <p className="mono-label text-zinc-600">Evaluating AI agents?</p>
-                <p className="mt-4 text-[14px] leading-relaxed text-zinc-500">
+                <p className="mono-label text-ink-3">Evaluating AI agents?</p>
+                <p className="mt-4 text-[14px] leading-relaxed text-ink-3">
                   Engineering RLE measures coding agents on executable RTL, DV, firmware,
                   and coverage tasks with protected grading.
                 </p>

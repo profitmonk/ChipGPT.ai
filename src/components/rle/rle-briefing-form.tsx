@@ -14,7 +14,7 @@ type Status = "idle" | "sending" | "sent" | "error";
 type FieldErrors = Partial<Record<"name" | "email" | "company", string>>;
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-const errorCls = "mt-1.5 text-[12px] text-red-400";
+const errorCls = "mt-1.5 text-[12px] text-danger";
 
 function validate(fd: FormData): FieldErrors {
   const errors: FieldErrors = {};
@@ -86,11 +86,11 @@ export function RleBriefingForm() {
   if (status === "sent") {
     return (
       <div className="panel p-8" role="status">
-        <p className="mono-label text-green-600">Request received</p>
-        <p className="mt-4 text-[15px] leading-relaxed text-zinc-300">
+        <p className="mono-label text-accent">Request received</p>
+        <p className="mt-4 text-[15px] leading-relaxed text-ink">
           Thanks — we&apos;ll follow up to schedule a 25-minute technical briefing. You can also
           reach us directly at{" "}
-          <a href="mailto:connect@chipgpt.ai" className="text-green-600 hover:text-green-500">
+          <a href="mailto:connect@chipgpt.ai" className="text-accent hover:text-accent">
             connect@chipgpt.ai
           </a>
           .
@@ -113,7 +113,7 @@ export function RleBriefingForm() {
       noValidate
       aria-labelledby="rle-form-title"
     >
-      <p id="rle-form-title" className="mono-label text-zinc-400">
+      <p id="rle-form-title" className="mono-label text-ink-2">
         Request an RLE Briefing
       </p>
       <div className="mt-5 grid gap-4">
@@ -181,23 +181,23 @@ export function RleBriefingForm() {
         <input type="text" name="website" tabIndex={-1} autoComplete="off"
           className="absolute left-[-9999px] h-0 w-0 opacity-0" aria-hidden="true" />
 
-        <p className="text-[12px] leading-relaxed text-zinc-400">
+        <p className="text-[12px] leading-relaxed text-ink-2">
           Deployment choices are for discovery only; listing an option does not mean it is
           available for every engagement. We use these details only to respond to your request.
           Please don&apos;t include confidential source, model weights, or credentials.
         </p>
 
         <div role="alert" aria-live="assertive">
-          {status === "error" && <p className="text-[13px] text-red-400">{error}</p>}
+          {status === "error" && <p className="text-[13px] text-danger">{error}</p>}
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" variant="primary" size="lg" disabled={status === "sending"}>
             {status === "sending" ? "Sending…" : "Request an RLE Briefing"}
           </Button>
-          <span className="text-[12px] text-zinc-400">
+          <span className="text-[12px] text-ink-2">
             or email{" "}
-            <a href="mailto:connect@chipgpt.ai" className="text-green-600 hover:text-green-500">
+            <a href="mailto:connect@chipgpt.ai" className="text-accent hover:text-accent">
               connect@chipgpt.ai
             </a>
           </span>

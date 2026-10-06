@@ -13,11 +13,11 @@ export function AgentNetworkSection({ embedded = false }: { embedded?: boolean }
           viewBox="0 0 600 420"
           fill="none"
         >
-          <line x1="300" y1="60" x2="300" y2="160" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-          <line x1="80" y1="210" x2="220" y2="210" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-          <line x1="380" y1="210" x2="520" y2="210" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-          <line x1="160" y1="320" x2="260" y2="260" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-          <line x1="440" y1="320" x2="340" y2="260" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+          <line x1="300" y1="60" x2="300" y2="160" stroke="rgba(28,27,24,0.14)" strokeWidth="1" />
+          <line x1="80" y1="210" x2="220" y2="210" stroke="rgba(28,27,24,0.14)" strokeWidth="1" />
+          <line x1="380" y1="210" x2="520" y2="210" stroke="rgba(28,27,24,0.14)" strokeWidth="1" />
+          <line x1="160" y1="320" x2="260" y2="260" stroke="rgba(28,27,24,0.14)" strokeWidth="1" />
+          <line x1="440" y1="320" x2="340" y2="260" stroke="rgba(28,27,24,0.14)" strokeWidth="1" />
         </svg>
 
         <DiagramNode
@@ -56,7 +56,7 @@ export function AgentNetworkSection({ embedded = false }: { embedded?: boolean }
         </div>
       </div>
 
-      <p className="mt-12 max-w-2xl text-[13px] leading-relaxed text-zinc-600">
+      <p className="mt-12 max-w-2xl text-[13px] leading-relaxed text-ink-3">
         All agents read from and write to a shared semiconductor knowledge graph—linking
         RTL hierarchies, verification artifacts, silicon data, yield records, and field
         failure history into a single reasoning context.
@@ -66,7 +66,7 @@ export function AgentNetworkSection({ embedded = false }: { embedded?: boolean }
 
   if (embedded) {
     return (
-      <section className="border-b border-white/[0.06]">
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <SectionHeader
             eyebrow="Agent Network"
@@ -80,7 +80,7 @@ export function AgentNetworkSection({ embedded = false }: { embedded?: boolean }
   }
 
   return (
-    <section className="border-b border-white/[0.06] bg-[#060606]">
+    <section className="border-b border-rule bg-paper-2">
       <div className="mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-36">
         <SectionHeader
           eyebrow="Agent Network"
@@ -104,10 +104,10 @@ function DiagramNode({
 }) {
   return (
     <div
-      className={`panel px-5 py-3 text-center ${variant === "center" ? "border-green-900/40 bg-[#0a120a]" : ""} ${className}`}
+      className={`panel px-5 py-3 text-center ${variant === "center" ? "border-accent/25 bg-accent-soft" : ""} ${className}`}
     >
       <span
-        className={`text-[13px] font-medium ${variant === "center" ? "text-green-500" : "text-zinc-300"}`}
+        className={`text-[13px] font-medium ${variant === "center" ? "text-accent" : "text-ink"}`}
       >
         {label}
       </span>

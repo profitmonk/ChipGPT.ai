@@ -1,23 +1,23 @@
 import type { AgentOutput } from "@/lib/content";
 
 const lineStyles = {
-  header: "font-mono text-[11px] text-zinc-500",
-  data: "font-mono text-[11px] text-zinc-400",
-  insight: "font-mono text-[11px] text-green-700",
-  source: "font-mono text-[10px] text-zinc-700",
+  header: "font-mono text-[11px] text-ink-3",
+  data: "font-mono text-[11px] text-ink-2",
+  insight: "font-mono text-[11px] text-accent",
+  source: "font-mono text-[10px] text-ink-3",
 };
 
 export function AgentOutputCard({ output }: { output: AgentOutput }) {
   return (
     <article className="panel overflow-hidden">
-      <div className="flex items-center justify-between border-b border-white/[0.07] bg-[#0a0a0a] px-4 py-2">
+      <div className="flex items-center justify-between border-b border-rule bg-surface px-4 py-2">
         <div>
-          <p className="mono-label text-green-700">{output.agent}</p>
-          <p className="mt-0.5 text-[12px] font-medium text-zinc-300">
+          <p className="mono-label text-accent">{output.agent}</p>
+          <p className="mt-0.5 text-[12px] font-medium text-ink">
             {output.title}
           </p>
         </div>
-        <span className="font-mono text-[10px] text-zinc-700">
+        <span className="font-mono text-[10px] text-ink-3">
           {output.timestamp}
         </span>
       </div>
@@ -28,8 +28,8 @@ export function AgentOutputCard({ output }: { output: AgentOutput }) {
           </p>
         ))}
       </div>
-      <div className="border-t border-white/[0.07] bg-[#0a0a0a] px-4 py-2">
-        <span className="mono-label text-zinc-700">Pending engineer review</span>
+      <div className="border-t border-rule bg-surface px-4 py-2">
+        <span className="mono-label text-ink-3">Pending engineer review</span>
       </div>
     </article>
   );

@@ -19,12 +19,12 @@ export function SeriesNav({ prev, next }: { prev: SeriesLink; next: SeriesLink }
       {prev ? (
         <Link
           href={`/blog/${prev.slug}`}
-          className="panel group rounded-md p-4 transition-colors hover:border-white/20"
+          className="panel group rounded-md p-4 transition-colors hover:border-rule-strong"
         >
-          <span className="mono-label text-zinc-500">
+          <span className="mono-label text-ink-3">
             <span aria-hidden>←</span> previous case
           </span>
-          <span className="mt-1.5 block text-[14px] text-zinc-300 transition-colors group-hover:text-white">
+          <span className="mt-1.5 block text-[14px] text-ink transition-colors group-hover:text-ink">
             {label(prev)}
           </span>
         </Link>
@@ -34,12 +34,12 @@ export function SeriesNav({ prev, next }: { prev: SeriesLink; next: SeriesLink }
       {next ? (
         <Link
           href={`/blog/${next.slug}`}
-          className="panel group rounded-md p-4 transition-colors hover:border-white/20 sm:text-right"
+          className="panel group rounded-md p-4 transition-colors hover:border-rule-strong sm:text-right"
         >
-          <span className="mono-label text-zinc-500">
+          <span className="mono-label text-ink-3">
             next case <span aria-hidden>→</span>
           </span>
-          <span className="mt-1.5 block text-[14px] text-zinc-300 transition-colors group-hover:text-white">
+          <span className="mt-1.5 block text-[14px] text-ink transition-colors group-hover:text-ink">
             {label(next)}
           </span>
         </Link>

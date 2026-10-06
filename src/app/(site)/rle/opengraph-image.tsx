@@ -8,10 +8,10 @@ export const alt = "ChipGPT Engineering RLE — executable evaluation for silico
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const BG = "#0b0d10";
-const ACCENT = "#22c55e";
-const MUTED = "#9aa4b2";
-const WHITE = "#f4f4f5";
+const BG = "#ffffff"; // white so the wordmark's white plate blends in
+const ACCENT = "#23408e";
+const MUTED = "#6b675e";
+const WHITE = "#1c1b18";
 
 async function loadFont(spec: string, text: string): Promise<ArrayBuffer> {
   const url = `https://fonts.googleapis.com/css2?family=${spec}&text=${encodeURIComponent(text)}`;
@@ -48,7 +48,7 @@ export default async function Image() {
   if (sansBold) fonts.push({ name: "sans", data: sansBold, style: "normal", weight: 700 });
 
   const logo = fs.readFileSync(
-    path.join(process.cwd(), "public", "brand", "chipgpt-wordmark-white.png"),
+    path.join(process.cwd(), "public", "brand", "chipgpt-wordmark.png"),
   );
   const logoUri = `data:image/png;base64,${logo.toString("base64")}`;
   const logoW = 300;

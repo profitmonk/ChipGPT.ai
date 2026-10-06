@@ -18,7 +18,7 @@ export default function OutcomesPage() {
         description="Qualitative signals, artifacts, and agent participation across the domains where design-partner programs see the fastest payback."
       />
 
-      <section className="border-b border-white/[0.06] bg-[#060606]">
+      <section className="border-b border-rule bg-paper-2">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-10 lg:py-20">
           <OperationalOutcomeCards />
         </div>
@@ -32,13 +32,13 @@ export default function OutcomesPage() {
             description="Outcomes that compound across roles and lifecycle stages as institutional memory grows."
             className="mb-8"
           />
-          <div className="grid gap-px border border-white/[0.07] bg-white/[0.07] sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-px border border-rule bg-rule sm:grid-cols-2 lg:grid-cols-3">
             {PAYBACK_OUTCOMES.map((outcome) => (
               <div
                 key={outcome}
-                className="flex min-h-full items-center bg-[#080808] px-6 py-6"
+                className="flex min-h-full items-center bg-surface px-6 py-6"
               >
-                <p className="text-[13px] font-medium leading-snug text-zinc-400">
+                <p className="text-[13px] font-medium leading-snug text-ink-2">
                   {outcome}
                 </p>
               </div>
