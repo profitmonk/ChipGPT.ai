@@ -1,7 +1,6 @@
 // Copy for /rle (ChipGPT Engineering RLE).
-// Source of truth: rv64-simple-rle/sales/ (website-agent-prompt.md,
-// claims-ledger.md, buyer-faq.md). Every number and availability statement here
-// must match claims-ledger.md — do not add claims without a ledger entry.
+// Copy is constrained by the internal RLE claims ledger: every number and
+// availability statement must match it — do not add claims without an entry.
 
 export const RLE_HREF = "/rle";
 export const RLE_FORM_ID = "rle-briefing";
@@ -121,8 +120,8 @@ export const RLE_PILOT_INCLUDES = [
   "Two technical reviews",
 ] as const;
 
-// Answers adapted from buyer-faq.md. Private deployment prices are deliberately
-// omitted (offer-and-pricing.md: do not publish the deployment ladder).
+// Answers adapted from the approved buyer FAQ. Deployment-tier pricing is
+// deliberately omitted (not approved for publication).
 export const RLE_FAQ = [
   {
     q: "What does 70/70 mean?",
