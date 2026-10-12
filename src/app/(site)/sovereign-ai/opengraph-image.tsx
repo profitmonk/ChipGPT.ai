@@ -2,9 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { ImageResponse } from "next/og";
 
-// Social card for /rle — same branded pattern as the site-wide card.
+// Social card for /sovereign-ai — same branded pattern as the site-wide card.
 export const runtime = "nodejs";
-export const alt = "ChipGPT Engineering RLE — executable evaluation for silicon-engineering agents";
+export const alt = "ChipGPT Sovereign AI — AI your engineering organization owns";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -34,10 +34,10 @@ async function font(specs: string[], text: string): Promise<ArrayBuffer> {
 }
 
 export default async function Image() {
-  const kicker = "ENGINEERING RLE";
-  const headline = "Know whether an AI agent can engineer silicon — not merely write Verilog.";
-  const footer = "Executable RTL · DV · firmware · coverage tasks";
-  const text = `${kicker} ${headline} ${footer} chipgpt.ai/rle`;
+  const kicker = "SOVEREIGN AI";
+  const headline = "AI your engineering organization owns.";
+  const footer = "Owned model · RL environment · evaluation · private infrastructure";
+  const text = `${kicker} ${headline} ${footer} chipgpt.ai/sovereign-ai`;
 
   const [sans, sansBold] = await Promise.all([
     font(["Geist:wght@500", "Inter:wght@500"], text).catch(() => null),
@@ -81,7 +81,7 @@ export default async function Image() {
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", color: MUTED, fontSize: 26 }}>{footer}</div>
-          <div style={{ display: "flex", color: WHITE, fontSize: 24, fontWeight: 700 }}>chipgpt.ai/rle</div>
+          <div style={{ display: "flex", color: WHITE, fontSize: 24, fontWeight: 700 }}>chipgpt.ai/sovereign-ai</div>
         </div>
       </div>
     ),

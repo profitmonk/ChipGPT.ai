@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { inputCls, labelCls } from "@/components/briefing-form";
 import { track } from "@/lib/analytics";
 import {
-  RLE_DEPLOYMENTS,
-  RLE_OBJECTIVES,
-  RLE_TIMELINES,
-} from "@/lib/rle-content";
+  SOVEREIGN_DEPLOYMENTS,
+  SOVEREIGN_OBJECTIVES,
+  SOVEREIGN_TIMELINES,
+} from "@/lib/sovereign-content";
 
 type Status = "idle" | "sending" | "sent" | "error";
 type FieldErrors = Partial<Record<"name" | "email" | "company", string>>;
@@ -27,8 +27,8 @@ function validate(fd: FormData): FieldErrors {
   return errors;
 }
 
-/** Briefing request for /rle. Posts to the shared /api/briefing endpoint with interest=rle. */
-export function RleBriefingForm() {
+/** Briefing request for /sovereign-ai. Posts to the shared /api/briefing endpoint with interest=sovereign. */
+export function SovereignBriefingForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -37,7 +37,7 @@ export function RleBriefingForm() {
   function onStart() {
     if (started.current) return;
     started.current = true;
-    track("rle_form_start");
+    track("sovereign_form_start");
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -48,13 +48,13 @@ export function RleBriefingForm() {
     setFieldErrors(errors);
     const firstInvalid = (["name", "email", "company"] as const).find((k) => errors[k]);
     if (firstInvalid) {
-      form.querySelector<HTMLElement>(`#rle-${firstInvalid}`)?.focus();
+      form.querySelector<HTMLElement>(`#sv-${firstInvalid}`)?.focus();
       return;
     }
 
     setStatus("sending");
     setError("");
-    const payload = { ...Object.fromEntries(fd.entries()), interest: "rle" };
+    const payload = { ...Object.fromEntries(fd.entries()), interest: "sovereign" };
     // Analytics gets categorical fields only — never names, companies, models, or free text.
     const categorical = {
       objective: String(fd.get("objective") || "unspecified"),
@@ -70,16 +70,16 @@ export function RleBriefingForm() {
       const data = await res.json();
       if (res.ok && data.ok) {
         setStatus("sent");
-        track("rle_form_submit_success", categorical);
+        track("sovereign_form_submit_success", categorical);
       } else {
         setStatus("error");
         setError(data.error || "Something went wrong. Please email connect@chipgpt.ai.");
-        track("rle_form_submit_error", { status: res.status });
+        track("sovereign_form_submit_error", { status: res.status });
       }
     } catch {
       setStatus("error");
       setError("Network error. Please email connect@chipgpt.ai.");
-      track("rle_form_submit_error", { status: 0 });
+      track("sovereign_form_submit_error", { status: 0 });
     }
   }
 
@@ -88,7 +88,7 @@ export function RleBriefingForm() {
       <div className="panel p-8" role="status">
         <p className="mono-label text-accent">Request received</p>
         <p className="mt-4 text-[15px] leading-relaxed text-ink">
-          Thanks — we&apos;ll follow up to schedule a 25-minute technical briefing. You can also
+          Thanks — we&apos;ll follow up to schedule a technical briefing. You can also
           reach us directly at{" "}
           <a href="mailto:connect@chipgpt.ai" className="text-accent hover:text-accent">
             connect@chipgpt.ai
@@ -101,7 +101,7 @@ export function RleBriefingForm() {
 
   const field = (key: keyof FieldErrors) => ({
     "aria-invalid": fieldErrors[key] ? true : undefined,
-    "aria-describedby": fieldErrors[key] ? `rle-${key}-error` : undefined,
+    "aria-describedby": fieldErrors[key] ? `sv-${key}-error` : undefined,
   });
 
   return (
@@ -111,70 +111,70 @@ export function RleBriefingForm() {
       onInput={onStart}
       className="panel p-6 sm:p-8"
       noValidate
-      aria-labelledby="rle-form-title"
+      aria-labelledby="sv-form-title"
     >
-      <p id="rle-form-title" className="mono-label text-ink-2">
-        Request an RLE Briefing
+      <p id="sv-form-title" className="mono-label text-ink-2">
+        Request a Briefing
       </p>
       <div className="mt-5 grid gap-4">
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="rle-name" className={labelCls}>Name *</label>
-            <input id="rle-name" name="name" required autoComplete="name" className={inputCls} {...field("name")} />
-            {fieldErrors.name && <p id="rle-name-error" className={errorCls}>{fieldErrors.name}</p>}
+            <label htmlFor="sv-name" className={labelCls}>Name *</label>
+            <input id="sv-name" name="name" required autoComplete="name" className={inputCls} {...field("name")} />
+            {fieldErrors.name && <p id="sv-name-error" className={errorCls}>{fieldErrors.name}</p>}
           </div>
           <div>
-            <label htmlFor="rle-email" className={labelCls}>Work email *</label>
-            <input id="rle-email" name="email" type="email" required autoComplete="email" className={inputCls} {...field("email")} />
-            {fieldErrors.email && <p id="rle-email-error" className={errorCls}>{fieldErrors.email}</p>}
+            <label htmlFor="sv-email" className={labelCls}>Work email *</label>
+            <input id="sv-email" name="email" type="email" required autoComplete="email" className={inputCls} {...field("email")} />
+            {fieldErrors.email && <p id="sv-email-error" className={errorCls}>{fieldErrors.email}</p>}
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="rle-company" className={labelCls}>Company *</label>
-            <input id="rle-company" name="company" required autoComplete="organization" className={inputCls} {...field("company")} />
-            {fieldErrors.company && <p id="rle-company-error" className={errorCls}>{fieldErrors.company}</p>}
+            <label htmlFor="sv-company" className={labelCls}>Company *</label>
+            <input id="sv-company" name="company" required autoComplete="organization" className={inputCls} {...field("company")} />
+            {fieldErrors.company && <p id="sv-company-error" className={errorCls}>{fieldErrors.company}</p>}
           </div>
           <div>
-            <label htmlFor="rle-role" className={labelCls}>Role</label>
-            <input id="rle-role" name="role" autoComplete="organization-title" className={inputCls} placeholder="e.g. Head of post-training" />
+            <label htmlFor="sv-role" className={labelCls}>Role</label>
+            <input id="sv-role" name="role" autoComplete="organization-title" className={inputCls} placeholder="e.g. VP Engineering, Head of DV" />
           </div>
         </div>
         <div>
-          <label htmlFor="rle-model" className={labelCls}>Model, agent, or product being evaluated</label>
-          <input id="rle-model" name="model" className={inputCls} placeholder="e.g. in-house coding agent, EDA assistant" />
+          <label htmlFor="sv-model" className={labelCls}>Models or agents in use today</label>
+          <input id="sv-model" name="model" className={inputCls} placeholder="e.g. frontier API, in-house open-weight model" />
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <label htmlFor="rle-objective" className={labelCls}>Primary objective</label>
-            <select id="rle-objective" name="objective" defaultValue="" className={inputCls}>
+            <label htmlFor="sv-objective" className={labelCls}>Primary objective</label>
+            <select id="sv-objective" name="objective" defaultValue="" className={inputCls}>
               <option value="">Select…</option>
-              {RLE_OBJECTIVES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {SOVEREIGN_OBJECTIVES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
           <div>
-            <label htmlFor="rle-deployment" className={labelCls}>Deployment constraint</label>
-            <select id="rle-deployment" name="deployment" defaultValue="" className={inputCls}>
+            <label htmlFor="sv-deployment" className={labelCls}>Deployment constraint</label>
+            <select id="sv-deployment" name="deployment" defaultValue="" className={inputCls}>
               <option value="">Select…</option>
-              {RLE_DEPLOYMENTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {SOVEREIGN_DEPLOYMENTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
           <div>
-            <label htmlFor="rle-timeline" className={labelCls}>Target timeline</label>
-            <select id="rle-timeline" name="timeline" defaultValue="" className={inputCls}>
+            <label htmlFor="sv-timeline" className={labelCls}>Target timeline</label>
+            <select id="sv-timeline" name="timeline" defaultValue="" className={inputCls}>
               <option value="">Select…</option>
-              {RLE_TIMELINES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              {SOVEREIGN_TIMELINES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
         </div>
         <div>
-          <label htmlFor="rle-priorities" className={labelCls}>Capability priorities</label>
+          <label htmlFor="sv-priorities" className={labelCls}>What should your AI get better at?</label>
           <textarea
-            id="rle-priorities"
+            id="sv-priorities"
             name="priorities"
             rows={4}
             className={inputCls}
-            placeholder="Which engineering capabilities matter most — RTL repair, DV, firmware, coverage…"
+            placeholder="Goals, capability gaps, data you want it to learn from…"
           />
         </div>
         {/* honeypot — hidden from users, catches bots */}
@@ -193,7 +193,7 @@ export function RleBriefingForm() {
 
         <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" variant="primary" size="lg" disabled={status === "sending"}>
-            {status === "sending" ? "Sending…" : "Request an RLE Briefing"}
+            {status === "sending" ? "Sending…" : "Request a Briefing"}
           </Button>
           <span className="text-[12px] text-ink-2">
             or email{" "}

@@ -13,16 +13,17 @@ const FROM = process.env.BRIEFING_FROM || "ChipGPT Briefings <onboarding@resend.
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
-// Interest topics (general form select + /rle form). Unknown values fall back.
+// Interest topics (general form select + /sovereign-ai form). Unknown values fall back.
 const INTERESTS: Record<string, string> = {
   coworkers: "AI co-workers",
-  rle: "Engineering RLE",
+  sovereign: "Sovereign AI",
+  rle: "Engineering RLE", // legacy value from the former /rle form
   other: "Other",
 };
 
-// Categorical /rle fields — only these whitelisted values are accepted.
-const RLE_CHOICES: Record<string, string[]> = {
-  objective: ["evaluation", "post-training", "regression", "vendor-selection", "eda-integration", "other"],
+// Categorical /sovereign-ai fields — only these whitelisted values are accepted.
+const CHOICES: Record<string, string[]> = {
+  objective: ["owned-model", "evaluation", "post-training", "coworkers", "private-infra", "other"],
   deployment: ["hosted-endpoint", "customer-vpc", "onprem-airgap-discovery", "undecided"],
   timeline: ["0-3-months", "3-6-months", "6-plus-months", "exploring"],
 };
@@ -30,7 +31,7 @@ const RLE_CHOICES: Record<string, string[]> = {
 const clip = (v: unknown, max = 2000) =>
   typeof v === "string" ? v.trim().slice(0, max) : "";
 const choice = (field: string, v: unknown) =>
-  typeof v === "string" && RLE_CHOICES[field].includes(v) ? v : "";
+  typeof v === "string" && CHOICES[field].includes(v) ? v : "";
 
 export async function POST(req: Request) {
   let body: Record<string, string>;
@@ -62,21 +63,21 @@ export async function POST(req: Request) {
     );
   }
 
-  const isRle = interest === "rle";
-  const text = isRle
+  const isSovereign = interest === "sovereign" || interest === "rle";
+  const text = isSovereign
     ? [
-        "New Engineering RLE briefing request from chipgpt.ai/rle",
+        `New ${INTERESTS[interest]} briefing request from chipgpt.ai/sovereign-ai`,
         "",
         `Name:       ${name}`,
         `Email:      ${email}`,
         `Company:    ${clip(company, 200) || "—"}`,
         `Role:       ${clip(body.role, 200) || "—"}`,
-        `Evaluating: ${clip(body.model, 300) || "—"}`,
+        `Models:     ${clip(body.model, 300) || "—"}`,
         `Objective:  ${choice("objective", body.objective) || "—"}`,
         `Deployment: ${choice("deployment", body.deployment) || "—"}`,
         `Timeline:   ${choice("timeline", body.timeline) || "—"}`,
         "",
-        "Capability priorities:",
+        "What should the AI get better at:",
         clip(body.priorities) || "—",
       ].join("\n")
     : [
@@ -98,7 +99,7 @@ export async function POST(req: Request) {
       from: FROM,
       to: [TO],
       replyTo: email, // reply goes straight to the lead
-      subject: `${isRle ? "RLE briefing request" : "Briefing request"} — ${name}${company?.trim() ? `, ${company}` : ""}`,
+      subject: `${isSovereign ? "RLE briefing request" : "Briefing request"} — ${name}${company?.trim() ? `, ${company}` : ""}`,
       text,
     });
     if (error) {
