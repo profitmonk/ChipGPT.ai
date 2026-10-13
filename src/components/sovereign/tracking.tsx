@@ -2,19 +2,19 @@
 
 import { useEffect } from "react";
 import { track } from "@/lib/analytics";
-import { RLE_GRADING_ID } from "@/lib/rle-content";
+import { SOVEREIGN_STACK_ID } from "@/lib/sovereign-content";
 
-/** Fires rle_page_view on mount and rle_grading_section_view once the grading section is seen. */
-export function RlePageTracking() {
+/** Fires sovereign_page_view on mount and sovereign_stack_view once the stack section is seen. */
+export function SovereignPageTracking() {
   useEffect(() => {
-    track("rle_page_view");
+    track("sovereign_page_view");
 
-    const el = document.getElementById(RLE_GRADING_ID);
+    const el = document.getElementById(SOVEREIGN_STACK_ID);
     if (!el || typeof IntersectionObserver === "undefined") return;
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
-          track("rle_grading_section_view");
+          track("sovereign_stack_view");
           io.disconnect();
         }
       },

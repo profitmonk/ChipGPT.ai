@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/blogs", destination: "/blog", permanent: false },
       { source: "/blogs/:slug", destination: "/blog/:slug", permanent: false },
+      // The RLE page grew into the sovereign AI platform page.
+      { source: "/rle", destination: "/sovereign-ai#rle", permanent: false },
     ];
   },
 };

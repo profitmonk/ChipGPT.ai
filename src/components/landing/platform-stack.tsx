@@ -17,7 +17,7 @@ const LAYERS = [
   {
     h: "Reliability",
     p: "Debug tooling, CI/CD, and benchmarks that keep AI-designed silicon trustworthy as it scales.",
-    link: { href: "/rle", label: "Engineering RLE: how we evaluate agents" },
+    link: { href: "/sovereign-ai#rle", label: "How we evaluate and improve models" },
   },
 ];
 

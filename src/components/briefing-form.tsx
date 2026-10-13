@@ -83,7 +83,7 @@ export function BriefingForm() {
           <label htmlFor="interest" className={labelCls}>Interested in</label>
           <select id="interest" name="interest" defaultValue="coworkers" className={inputCls}>
             <option value="coworkers">AI co-workers for my engineering team</option>
-            <option value="rle">Engineering RLE — evaluating or training AI agents</option>
+            <option value="sovereign">Sovereign AI — owning, training, or evaluating our own models</option>
             <option value="other">Something else</option>
           </select>
         </div>

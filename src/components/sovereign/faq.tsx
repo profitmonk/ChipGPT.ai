@@ -1,18 +1,18 @@
 "use client";
 
 import { track } from "@/lib/analytics";
-import { RLE_FAQ } from "@/lib/rle-content";
+import { SOVEREIGN_FAQ } from "@/lib/sovereign-content";
 
-export function RleFaq() {
+export function SovereignFaq() {
   return (
     <div className="border-t border-rule">
-      {RLE_FAQ.map((item, i) => (
+      {SOVEREIGN_FAQ.map((item, i) => (
         <details
           key={item.q}
           className="group border-b border-rule"
           onToggle={(e) => {
             if ((e.currentTarget as HTMLDetailsElement).open) {
-              track("rle_faq_expand", { question: i + 1 });
+              track("sovereign_faq_expand", { question: i + 1 });
             }
           }}
         >

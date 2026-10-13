@@ -57,14 +57,14 @@ export default function DemoPage() {
               </div>
 
               <div className="panel p-8">
-                <p className="mono-label text-ink-3">Evaluating AI agents?</p>
+                <p className="mono-label text-ink-3">Want AI you own?</p>
                 <p className="mt-4 text-[14px] leading-relaxed text-ink-3">
-                  Engineering RLE measures coding agents on executable RTL, DV, firmware,
-                  and coverage tasks with protected grading.
+                  Sovereign AI: your own model, trained and evaluated on executable
+                  engineering tasks, running on infrastructure you control.
                 </p>
                 <div className="mt-6">
                   <Button variant="outline" size="lg" asChild>
-                    <Link href="/rle">See Engineering RLE</Link>
+                    <Link href="/sovereign-ai">See Sovereign AI</Link>
                   </Button>
                 </div>
               </div>
