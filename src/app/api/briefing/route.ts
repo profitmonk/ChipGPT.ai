@@ -23,7 +23,7 @@ const INTERESTS: Record<string, string> = {
 
 // Categorical /sovereign-ai fields — only these whitelisted values are accepted.
 const CHOICES: Record<string, string[]> = {
-  objective: ["owned-model", "evaluation", "post-training", "coworkers", "private-infra", "other"],
+  objective: ["ai-ready-data", "owned-model", "evaluation", "post-training", "coworkers", "private-infra", "other"],
   deployment: ["hosted-endpoint", "customer-vpc", "onprem-airgap-discovery", "undecided"],
   timeline: ["0-3-months", "3-6-months", "6-plus-months", "exploring"],
 };

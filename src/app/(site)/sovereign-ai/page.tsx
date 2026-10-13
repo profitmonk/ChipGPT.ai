@@ -6,12 +6,14 @@ import { SovereignFaq } from "@/components/sovereign/faq";
 import { SovereignPageTracking, TrackedAnchor } from "@/components/sovereign/tracking";
 import {
   RLE_EVIDENCE,
+  SOVEREIGN_ADVANTAGES,
   SOVEREIGN_DATA,
   SOVEREIGN_DESCRIPTION,
   SOVEREIGN_FORM_ID,
   SOVEREIGN_LOOP,
+  SOVEREIGN_LAYERS,
   SOVEREIGN_PHASES,
-  SOVEREIGN_STACK,
+  SOVEREIGN_RAIL,
   SOVEREIGN_STACK_ID,
   SOVEREIGN_TITLE,
   SOVEREIGN_WHY,
@@ -38,61 +40,66 @@ const container = "mx-auto max-w-7xl px-6 lg:px-10";
 const section = "border-b border-rule";
 const sub = "text-ink-2";
 
-/** Sources → private infrastructure → learning loop → owned model → co-workers. */
-function DataFlowDiagram() {
-  const node = "border border-rule bg-surface px-4 py-3";
-  const arrow = (
-    <div aria-hidden className="flex items-center justify-center py-2 font-sans text-[15px] text-accent lg:px-3 lg:py-0">
-      <span className="lg:hidden">↓</span>
-      <span className="hidden lg:inline">→</span>
-    </div>
-  );
+/** Layered stack: interfaces on top, data at the base, model rail alongside. */
+function ArchitectureDiagram() {
   return (
     <figure>
-      <div className="grid items-stretch lg:grid-cols-[1.3fr_auto_1.4fr_auto_1fr]">
-        {/* Sources */}
+      <div className="grid gap-4 lg:grid-cols-[1fr_17rem]">
+        <ol className="flex flex-col gap-2">
+          {SOVEREIGN_LAYERS.map((l, i) => {
+            const n = SOVEREIGN_LAYERS.length - i;
+            const isData = n === 1;
+            return (
+              <li
+                key={l.k}
+                className={`grid gap-3 border px-4 py-4 md:grid-cols-[11rem_1fr] md:gap-5 ${
+                  isData ? "border-accent/30 bg-accent-soft" : "border-rule bg-surface"
+                }`}
+              >
+                <div>
+                  <span className="font-sans text-[12px] tabular-nums text-ink-3">Layer {n}</span>
+                  <h3 className="font-serif text-[1.2rem] leading-tight text-ink">{l.k}</h3>
+                </div>
+                <div>
+                  <ul className="flex flex-wrap gap-1.5">
+                    {l.items.map((it) => (
+                      <li
+                        key={it}
+                        className="border border-rule bg-paper px-2 py-1 font-sans text-[12.5px] font-medium text-ink"
+                      >
+                        {it}
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-[15px] leading-snug text-ink-2">{l.v}</p>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
         <div className="flex flex-col gap-2">
-          <p className="mono-label mb-1 text-ink-3">Data</p>
-          {SOVEREIGN_DATA.map((d) => (
-            <div key={d.k} className={node}>
-              <h3 className="font-sans text-[14px] font-semibold text-ink">{d.k}</h3>
-              <p className="mt-1 text-[14px] leading-snug text-ink-2">{d.v}</p>
+          <p className="mono-label text-accent">Model routing</p>
+          {SOVEREIGN_RAIL.map((r, i) => (
+            <div
+              key={r.k}
+              className={`border px-4 py-4 ${i === 0 ? "border-ink/30 bg-surface" : "border-dashed border-rule-strong bg-paper"}`}
+            >
+              <h3 className="font-sans text-[14px] font-semibold text-ink">{r.k}</h3>
+              <p className="mt-1 text-[14px] leading-snug text-ink-2">{r.v}</p>
             </div>
           ))}
-        </div>
-        {arrow}
-        {/* Infrastructure + learning loop */}
-        <div className="flex flex-col border border-accent/30 bg-accent-soft p-4">
-          <p className="mono-label text-accent">Private infrastructure</p>
-          <p className="mt-1 font-sans text-[13px] text-ink-2">Ingest · store · govern · train · serve — in your environment</p>
-          <div className="my-auto grid gap-2 py-4 sm:grid-cols-3">
-            {["Goal-driven tasks", "RL environment", "Evaluation"].map((k) => (
-              <div key={k} className={`${node} flex min-h-[64px] items-center justify-center text-center`}>
-                <p className="font-sans text-[13px] font-medium text-ink">{k}</p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-3 text-center font-sans text-[12px] text-ink-3">
-            measure → generate → train → re-verify, continuously
-          </p>
-        </div>
-        {arrow}
-        {/* Outputs */}
-        <div className="flex flex-col gap-2">
-          <p className="mono-label mb-1 text-ink-3">Yours</p>
-          <div className={`${node} border-ink/30`}>
-            <p className="font-sans text-[14px] font-medium text-ink">Owned model</p>
-            <p className="mt-1 font-sans text-[12px] text-ink-3">Weights you train stay yours</p>
-          </div>
-          <div className={node}>
-            <p className="font-sans text-[14px] font-medium text-ink">AI co-workers</p>
-            <p className="mt-1 font-sans text-[12px] text-ink-3">RTL, DV, bring-up, and more</p>
+          <div className="border border-accent/30 bg-accent-soft px-4 py-4">
+            <h3 className="font-sans text-[14px] font-semibold text-ink">Learning loop</h3>
+            <p className="mt-1 text-[14px] leading-snug text-ink-2">
+              Empirical and synthetic tasks train the model in the RL environment. Evaluation gates
+              every change.
+            </p>
           </div>
         </div>
       </div>
-      <figcaption className="mt-4 text-[14px] text-ink-3">
-        Real-time, historical, and expert-generated data flow into infrastructure you control,
-        where tasks, the learning environment, and evaluations improve a model you own.
+      <figcaption className="mt-4 max-w-3xl text-[14px] text-ink-3">
+        Data flows up from your systems of record; engineers reach it through skills in the tools
+        they already use. Every layer runs in your environment.
       </figcaption>
     </figure>
   );
@@ -111,9 +118,9 @@ export default function SovereignAiPage() {
             AI your engineering organization <em className="italic text-accent">owns</em>.
           </h1>
           <p className={`mt-7 max-w-2xl text-[1.15rem] leading-[1.7] ${sub}`}>
-            Your own model, trained in a learning environment built around your goals, measured by
-            evaluations you control, and running on private infrastructure that ingests and manages
-            all of your engineering data.
+            A private stack that makes your engineering data AI-ready, turns your design knowledge
+            into a reasoning graph and skills your teams own, and runs on a model you control,
+            plugged into the orchestrators and tools your engineers already use.
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <Button variant="primary" size="lg" asChild>
@@ -122,7 +129,7 @@ export default function SovereignAiPage() {
               </TrackedAnchor>
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <a href={`#${SOVEREIGN_STACK_ID}`}>See the stack</a>
+              <a href={`#${SOVEREIGN_STACK_ID}`}>See the architecture</a>
             </Button>
           </div>
         </div>
@@ -134,7 +141,7 @@ export default function SovereignAiPage() {
           <SectionHeader
             descriptionClassName="text-ink-2"
             eyebrow="Why sovereign"
-            title="Rented intelligence can't learn your silicon."
+            title="Most AI can't use what your organization knows."
             className="mb-10"
           />
           <div className="grid gap-px border border-rule bg-rule md:grid-cols-3">
@@ -148,38 +155,38 @@ export default function SovereignAiPage() {
         </div>
       </section>
 
-      {/* Stack */}
+      {/* Architecture */}
       <section id={SOVEREIGN_STACK_ID} className={`${section} scroll-mt-14 bg-paper-2`}>
         <div className={`${container} py-16 lg:py-24`}>
           <SectionHeader
             descriptionClassName="text-ink-2"
-            eyebrow="The stack"
-            title="Five parts, one system you control."
-            description="Each part is useful alone. Together they form a loop that makes your AI measurably better at your work."
+            eyebrow="The architecture"
+            title="Data is the blood. The graph is the brain. Skills are the body."
+            description="Five layers, each one built on the one below. Agents bolted onto raw data skip the middle; this stack doesn't."
             className="mb-10"
           />
-          <ol className="border-t border-rule">
-            {SOVEREIGN_STACK.map((c, i) => (
-              <li key={c.k} className="grid gap-2 border-b border-rule py-6 sm:grid-cols-[3rem_14rem_1fr] sm:gap-6">
-                <span className="font-sans text-[13px] tabular-nums text-ink-3">0{i + 1}</span>
-                <h3 className="font-serif text-[1.35rem] leading-tight text-ink">{c.k}</h3>
-                <p className={`max-w-[62ch] text-[16px] leading-relaxed ${sub}`}>{c.v}</p>
-              </li>
-            ))}
-          </ol>
+          <ArchitectureDiagram />
         </div>
       </section>
 
-      {/* Data foundation */}
+      {/* Data */}
       <section className={section}>
         <div className={`${container} py-16 lg:py-24`}>
           <SectionHeader
             descriptionClassName="text-ink-2"
-            eyebrow="Built on your data — and ours"
-            title="Three sources of learning signal."
+            eyebrow="Built on your data, and ours"
+            title="Three kinds of data. Two jobs: run the work, and train the model."
             className="mb-10"
           />
-          <DataFlowDiagram />
+          <div className="grid gap-px border border-rule bg-rule md:grid-cols-3">
+            {SOVEREIGN_DATA.map((d) => (
+              <div key={d.k} className="bg-surface px-6 py-7">
+                <p className="mono-label text-accent">{d.use}</p>
+                <h3 className="mt-2 font-serif text-[1.35rem] text-ink">{d.k}</h3>
+                <p className={`mt-2 text-[16px] leading-relaxed ${sub}`}>{d.v}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -205,8 +212,28 @@ export default function SovereignAiPage() {
         </div>
       </section>
 
+      {/* Advantages */}
+      <section className={section}>
+        <div className={`${container} py-16 lg:py-24`}>
+          <SectionHeader
+            descriptionClassName="text-ink-2"
+            eyebrow="Why this design"
+            title="Built so the advantage stays with you."
+            className="mb-10"
+          />
+          <div className="grid gap-px border border-rule bg-rule md:grid-cols-3">
+            {SOVEREIGN_ADVANTAGES.map((w) => (
+              <div key={w.k} className="bg-surface px-6 py-7">
+                <h3 className="font-sans text-[15px] font-semibold text-ink">{w.k}</h3>
+                <p className={`mt-2 text-[16px] leading-relaxed ${sub}`}>{w.v}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Proof: Engineering RLE */}
-      <section id="rle" className={`${section} scroll-mt-14`}>
+      <section id="rle" className={`${section} scroll-mt-14 bg-paper-2`}>
         <div className={`${container} py-16 lg:py-24`}>
           <div className="grid gap-10 lg:grid-cols-[1fr_1.2fr]">
             <SectionHeader
@@ -235,7 +262,7 @@ export default function SovereignAiPage() {
       </section>
 
       {/* Engagement */}
-      <section className={`${section} bg-paper-2`}>
+      <section className={section}>
         <div className={`${container} py-16 lg:py-24`}>
           <SectionHeader
             descriptionClassName="text-ink-2"
@@ -261,7 +288,7 @@ export default function SovereignAiPage() {
       </section>
 
       {/* FAQ */}
-      <section className={section}>
+      <section className={`${section} bg-paper-2`}>
         <div className={`${container} py-16 lg:py-24`}>
           <SectionHeader eyebrow="FAQ" title="Questions we hear first." className="mb-10" />
           <div className="max-w-3xl">

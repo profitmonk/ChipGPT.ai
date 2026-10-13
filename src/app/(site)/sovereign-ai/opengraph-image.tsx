@@ -36,7 +36,7 @@ async function font(specs: string[], text: string): Promise<ArrayBuffer> {
 export default async function Image() {
   const kicker = "SOVEREIGN AI";
   const headline = "AI your engineering organization owns.";
-  const footer = "Owned model · RL environment · evaluation · private infrastructure";
+  const footer = "AI-ready data · reasoning graph · skills · owned model";
   const text = `${kicker} ${headline} ${footer} chipgpt.ai/sovereign-ai`;
 
   const [sans, sansBold] = await Promise.all([
